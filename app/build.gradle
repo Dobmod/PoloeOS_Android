@@ -7,7 +7,7 @@ android {
         applicationId "com.ansdoship.poloeos"
         minSdkVersion 14
         targetSdkVersion 30
-        versionCode 15
+        versionCode 16
         versionName "build1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
