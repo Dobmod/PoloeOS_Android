@@ -35,6 +35,7 @@ import com.ansdoship.poloeos.util.*;
 import android.content.res.AssetFileDescriptor;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.graphics.drawable.ColorDrawable;
 
 
 public class MainActivity extends Activity implements View.OnClickListener
@@ -94,6 +95,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 					okButton.setTypeface(tf);
 					dialogContent.setText(msg.getData().getString("error"));
 					final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(view).setCancelable(false). create();
+					final Window window = dialog.getWindow();
+					window.setBackgroundDrawable(new ColorDrawable(0));
 					okButton.setOnClickListener(new View.OnClickListener(){
 
 							@Override
@@ -308,12 +311,14 @@ public class MainActivity extends Activity implements View.OnClickListener
 			case R.id.bt_space:
 			case R.id.bt_back:
 			case R.id.bt_f:
+			case R.id.bt_q:
 				Button button = (Button)p1;
 				words = button.getText().toString();
 				break;
 			default:
 		}
 		mEngine.callScriptMethod("keyEvent", new Object[]{words});
+		SoundPoolUtil.getInstance().play("os.click",1);
 	}
 
 	private void checkUsing()

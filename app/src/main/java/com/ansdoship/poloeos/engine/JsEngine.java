@@ -53,6 +53,7 @@ public class JsEngine
 	public void shutdown()
 	{
 		callScriptMethod("leaveGame",new Object[]{});
+		modTickThread.shutdown();
 		System.exit(0);
 	}
 
@@ -85,6 +86,7 @@ public class JsEngine
 			modTickThread.start();
 			callScriptMethod("useItem",new Object[]{0,-1,0,280,1});
 			callScriptMethod("keyEvent",new Object[]{"Boot"});
+			callScriptMethod("setEnvironment",new Object[]{"APK"});
 			org.mozilla.javascript.Context.exit();
         }
 		catch(Exception e){
@@ -150,11 +152,13 @@ public class JsEngine
 	private class MyThread extends Thread implements Runnable
 	{
 
+		private boolean isRun = true;
+		
 		@Override
 		public void run() 
 		{
 			super.run();
-			while(true){
+			while(isRun){
 				try
 				{
 					callScriptMethod("modTick",new Object[]{});
@@ -168,6 +172,10 @@ public class JsEngine
 					e.printStackTrace();
 				}
 			}
+		}
+		
+		public void shutdown(){
+			isRun = false;
 		}
 	}
 	}
