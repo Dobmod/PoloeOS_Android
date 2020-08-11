@@ -18,6 +18,11 @@ import java.io.FileReader;
 import java.io.Reader;
 import com.ansdoship.poloeos.activity.MainActivity;
 import android.widget.Toast;
+import android.os.Message;
+import com.ansdoship.poloeos.util.*;
+import android.os.Bundle;
+import android.os.Handler;
+import java.io.*;
 
 public class JsEngine
 {
@@ -26,6 +31,7 @@ public class JsEngine
     private Scriptable scope;
 	private Activity context;
 	private MyThread modTickThread;
+	private Handler mHandler;
 
     private String jsCode = "";
     private String testCode;
@@ -39,6 +45,10 @@ public class JsEngine
 		this.modTickThread = new MyThread();
         initJsEngine();
     }
+	
+	public void setHandler(Handler h){
+		this.mHandler = h;
+	}
 
 	public void shutdown()
 	{
@@ -79,7 +89,12 @@ public class JsEngine
         }
 		catch(Exception e){
 			e.printStackTrace();
-			Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+			Message msg = new Message();
+			msg.what = MessageType.ACTION_ERRORDIALOG_SHOW;
+			Bundle data = new Bundle();
+			data.putString("error",getExceptionAllinformation(e));
+			msg.setData(data);
+			mHandler.sendMessage(msg);
 		}
 		finally
 		{
@@ -115,6 +130,19 @@ public class JsEngine
 		Object o = ScriptableObject.getProperty(scope,"OS.SCREEN_HEIGHT");
 		return (int)o;
 	}
+	
+	private String getExceptionAllinformation(Exception ex) {  
+        ByteArrayOutputStream out = new ByteArrayOutputStream();  
+        PrintStream pout = new PrintStream(out);  
+        ex.printStackTrace(pout);  
+        String ret = new String(out.toByteArray());  
+        pout.close();  
+        try {  
+			out.close();  
+        } catch (Exception e) {  
+        }  
+        return ret;  
+	}  
 	
 	
     // 对应类中需要需要被调用的方法，可以做为 JS 代码执行时的回调

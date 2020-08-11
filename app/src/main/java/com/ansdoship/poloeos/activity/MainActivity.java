@@ -33,6 +33,8 @@ import android.os.Build;
 import android.Manifest;
 import com.ansdoship.poloeos.util.*;
 import android.content.res.AssetFileDescriptor;
+import android.app.AlertDialog;
+import android.view.LayoutInflater;
 
 
 public class MainActivity extends Activity implements View.OnClickListener
@@ -49,7 +51,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 	private ScreenView screenView;
 	private Typeface tf;
 	private int unitSize;
-	private String[] soundName = {"bdrum","bell","bass","flute","guitar","harp","icechime","pling","snare","xylobone"};
+	private String[] noteSoundName = {"bdrum","bell","bass","flute","guitar","harp","icechime","pling","snare","xylobone"};
+	private String[] osSoundName = {"click","start","error","noise","beep"};
 
 	private Handler mHandler = new Handler(){
 
@@ -80,6 +83,26 @@ public class MainActivity extends Activity implements View.OnClickListener
 						}
 					};
 					timer.start();
+					break;
+				case MessageType.ACTION_ERRORDIALOG_SHOW:
+					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.error_dialog,null);
+					TextView dialogTitle = view.findViewById(R.id.error_dialog_title),dialogContent = view.findViewById(R.id.error_dialog_content),dialogIntroduction = view.findViewById(R.id.error_dialog_introduction);
+					Button okButton = view.findViewById(R.id.error_dialog_button);
+					dialogTitle.setTypeface(tf);
+					dialogContent.setTypeface(tf);
+					dialogIntroduction.setTypeface(tf);
+					okButton.setTypeface(tf);
+					dialogContent.setText(msg.getData().getString("error"));
+					final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(view).setCancelable(false). create();
+					okButton.setOnClickListener(new View.OnClickListener(){
+
+							@Override
+							public void onClick(View p1)
+							{
+								dialog.dismiss();
+							}
+						});
+					dialog.show();
 					break;
 			}
 		}
@@ -205,9 +228,14 @@ public class MainActivity extends Activity implements View.OnClickListener
 				{
 					try
 					{
-						for(int i = 0;i<soundName.length;i++){
-							AssetFileDescriptor afd = getAssets().openFd("sounds/"+soundName[i]+".ogg");
-							SoundPoolUtil.getInstance().loadRF("note."+soundName[i],afd);
+						//音效加载
+						for(int i = 0;i<noteSoundName.length;i++){
+							AssetFileDescriptor afd = getAssets().openFd("sounds/note/"+noteSoundName[i]+".ogg");
+							SoundPoolUtil.getInstance().loadRF("note."+noteSoundName[i],afd);
+						}
+						for(int i = 0;i<osSoundName.length;i++){
+							AssetFileDescriptor afd = getAssets().openFd("sounds/os/"+osSoundName[i]+".ogg");
+							SoundPoolUtil.getInstance().loadRF("os."+osSoundName[i],afd);
 						}
 					}
 					catch (IOException e)
@@ -440,7 +468,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 	public void initializeEngine()
 	{
 		mEngine = new JsEngine(this);
+		mEngine.setHandler(mHandler);
 		mEngine.request();
+		
 	}
 
 	public static String getBarnDir()
