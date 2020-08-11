@@ -19,7 +19,7 @@
 		android:layout_width="wrap_content"
 		android:orientation="vertical"
 		android:layout_gravity="bottom|center_horizontal"
-		android:background="@drawable/panel"
+		android:background="@drawable/dialog_background"
 		android:visibility="gone">
 
 		<LinearLayout
@@ -201,10 +201,10 @@
 	<LinearLayout
 		android:id="@+id/menu_panel"
 		android:layout_height="wrap_content"
-		android:layout_width="100dp"
+		android:layout_width="120dp"
 		android:orientation="horizontal"
 		android:layout_gravity="top|left"
-		android:background="@drawable/left_panel"
+		android:background="@drawable/dialog_background"
 		android:paddingTop="5dp"
 		android:paddingRight="10dp"
 		android:paddingLeft="10dp"
@@ -212,8 +212,9 @@
 		android:visibility="gone">
 
 		<Button
+			android:id="@+id/bt_menu"
 			android:layout_height="wrap_content"
-			android:text="J"
+			android:text="Menu"
 			android:background="@drawable/button_style"
 			android:textColor="#FFFFFFFF"
 			android:textStyle="bold"
@@ -223,9 +224,10 @@
 			android:layout_weight="1.0"/>
 
 		<Button
+			android:id="@+id/bt_boot"
 			android:layout_height="wrap_content"
 			android:layout_width="0dp"
-			android:text="K"
+			android:text="Boot"
 			android:background="@drawable/button_style"
 			android:textColor="#FFFFFFFF"
 			android:textStyle="bold"
@@ -237,14 +239,15 @@
 
 	<Button
 		android:id="@+id/menu_trigger"
-		android:layout_height="wrap_content"
-		android:layout_width="40dp"
+		android:layout_height="30dp"
+		android:layout_width="25dp"
 		android:text="..."
-		android:background="@drawable/button_style"
+		android:background="@drawable/grey_button_style"
 		android:textColor="#FFFFFFFF"
 		android:textStyle="bold"
 		android:gravity="center"
-		android:visibility="gone"/>
+		android:visibility="visible"
+		android:padding="1dp"/>
 
 	<TextView
 		android:id="@+id/text_box"

@@ -36,6 +36,7 @@ import android.content.res.AssetFileDescriptor;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.graphics.drawable.ColorDrawable;
+import android.view.*;
 
 
 public class MainActivity extends Activity implements View.OnClickListener
@@ -45,7 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 	public static String dir = "";
 	public JsEngine mEngine;
 	private TextView textBox;
-	private Button sendBt,upBt,leftBt,rightBt,downBt,enterBt,spaceBt,fBt,qBt,backBt,homeBt;
+	private Button sendBt,upBt,leftBt,rightBt,downBt,enterBt,spaceBt,fBt,qBt,backBt,homeBt,bootBt,menuBt;
 	private Button menuTriggerBt;
 	private EditText editText;
 	private LinearLayout panel,menuPanel;
@@ -106,6 +107,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 							}
 						});
 					dialog.show();
+					SoundPoolUtil.getInstance(). play("os.error",1);
 					break;
 			}
 		}
@@ -147,7 +149,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 		fBt = findViewById(R.id.bt_f);
 		qBt = findViewById(R.id.bt_q);
 		homeBt = findViewById(R.id.bt_home);
-
+		bootBt = findViewById(R.id.bt_boot);
+		menuBt = findViewById(R.id.bt_menu);
+		
 		sendBt.setTypeface(tf);
 		upBt.setTypeface(tf);
 		leftBt.setTypeface(tf);
@@ -159,6 +163,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 		backBt.setTypeface(tf);
 		qBt.setTypeface(tf);
 		homeBt.setTypeface(tf);
+		bootBt.setTypeface(tf);
+		menuBt.setTypeface(tf);
 
 		textBox.setTypeface(tf);
 
@@ -172,6 +178,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 		backBt.setOnClickListener(this);
 		qBt.setOnClickListener(this);
 		homeBt.setOnClickListener(this);
+		bootBt.setOnClickListener(this);
+		menuBt.setOnClickListener(this);
 		editText = findViewById(R.id.something);
 		editText.setTypeface(tf);
 		screenView = findViewById(R.id.screen_view);
@@ -187,6 +195,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					String text = editText.getEditableText().toString();
 					Level.text = text;
 					mEngine.callScriptMethod("keyEvent", new Object[]{text});
+					SoundPoolUtil.getInstance().play("os.click",1);
 				}
 
 			});
@@ -218,7 +227,6 @@ public class MainActivity extends Activity implements View.OnClickListener
 		
 		loadResources();
 
-		
 		initializeEngine();
     }
 
@@ -315,10 +323,28 @@ public class MainActivity extends Activity implements View.OnClickListener
 				Button button = (Button)p1;
 				words = button.getText().toString();
 				break;
+			case R.id.bt_boot:
+				words = "Boot";
+				SoundPoolUtil.getInstance().play("os.beep",1);
+				break;
+			case R.id.bt_menu:
+				break;
 			default:
 		}
 		mEngine.callScriptMethod("keyEvent", new Object[]{words});
 		SoundPoolUtil.getInstance().play("os.click",1);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event)
+	{
+		if(menuPanel.getVisibility()==View.VISIBLE){
+			Animation anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_in);
+			menuPanel.startAnimation(anim_1);
+			menuPanel.setVisibility(View.GONE);
+			menuTriggerBt.setVisibility(View.VISIBLE);
+		}
+		return super.onTouchEvent(event);
 	}
 
 	private void checkUsing()
