@@ -195,7 +195,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					String text = editText.getEditableText().toString();
 					Level.text = text;
 					mEngine.callScriptMethod("keyEvent", new Object[]{text});
-					SoundPoolUtil.getInstance().play("os.click",1);
+					SoundPoolUtil.getInstance().play("os.click",0);
 				}
 
 			});
@@ -325,14 +325,14 @@ public class MainActivity extends Activity implements View.OnClickListener
 				break;
 			case R.id.bt_boot:
 				words = "Boot";
-				SoundPoolUtil.getInstance().play("os.beep",1);
+				SoundPoolUtil.getInstance().play("os.beep",0);
 				break;
 			case R.id.bt_menu:
 				break;
 			default:
 		}
 		mEngine.callScriptMethod("keyEvent", new Object[]{words});
-		SoundPoolUtil.getInstance().play("os.click",1);
+		SoundPoolUtil.getInstance().play("os.click",0);
 	}
 
 	@Override

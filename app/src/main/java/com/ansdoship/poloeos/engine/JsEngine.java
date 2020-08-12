@@ -32,6 +32,7 @@ public class JsEngine
 	private Activity context;
 	private MyThread modTickThread;
 	private Handler mHandler;
+	private int errorNum = 0;
 
     private String jsCode = "";
     private String testCode;
@@ -40,28 +41,28 @@ public class JsEngine
 	{
 		this.context = ctx;
         this.clazz = JsEngine.class;
-		this.testCode = FileIO.getFromAssets(ctx.getResources(),"conf.js");
-		this.code = FileIO.readLocalFile(MainActivity.dir+"/poloeos.js");
+		this.testCode = FileIO.getFromAssets(ctx.getResources(), "conf.js");
+		this.code = FileIO.readLocalFile(MainActivity.dir + "/poloeos.js");
 		this.modTickThread = new MyThread();
         initJsEngine();
     }
-	
-	public void setHandler(Handler h){
+
+	public void setHandler(Handler h)
+	{
 		this.mHandler = h;
 	}
 
 	public void shutdown()
 	{
-		callScriptMethod("leaveGame",new Object[]{});
+		callScriptMethod("leaveGame", new Object[]{});
 		modTickThread.shutdown();
 		System.exit(0);
 	}
 
     private void initJsEngine()
 	{
-        jsCode = "var ScriptAPI = java.lang.Class.forName(\"" + JsEngine.class.getName() + "\", true, javaLoader);\n"
-			+ testCode + code + "";
-		jsCode = "var barnDir = \""+MainActivity.dir+"\";\n"+testCode+"\n"+code +"\nfunction keyEvent(word){OS.keyEvent(word);}";
+        //jsCode = "var ScriptAPI = java.lang.Class.forName(\"" + JsEngine.class.getName() + "\", true, javaLoader);\n"+ testCode + code + "";
+		jsCode = "var barnDir = \"" + MainActivity.dir + "\";\n" + testCode + "\n" + code + "\nfunction keyEvent(word){OS.keyEvent(word);}";
     }
 
     public void request()
@@ -70,8 +71,8 @@ public class JsEngine
         rhino.setOptimizationLevel(-1);
         try
 		{
-			Reader reader = new FileReader(new File(MainActivity.dir+"/poloeos.js"));
-			Script script = rhino.compileReader(reader,"poloeos.js",0,null);
+			Reader reader = new FileReader(new File(MainActivity.dir + "/poloeos.js"));
+			Script script = rhino.compileReader(reader, "poloeos.js", 0, null);
             scope = rhino.initStandardObjects();
             // 这两句是设置当前的类做为上下文以及获取当前的类加载器，以便于 rhino 通过反射获取档期类
             ScriptableObject.putProperty(scope, "javaContext", org.mozilla.javascript.Context.javaToJS(this, scope));
@@ -81,22 +82,27 @@ public class JsEngine
 			ScriptableObject.defineClass(scope, Player.class);
 			ScriptableObject.defineClass(scope, Block.class);
             //执行 js 代码
-           Object x = rhino.evaluateString(scope, jsCode, clazz.getSimpleName(), 1, null);
+			Object x = rhino.evaluateString(scope, jsCode, clazz.getSimpleName(), 1, null);
 			//script.exec(rhino,scope);
 			modTickThread.start();
-			callScriptMethod("useItem",new Object[]{0,-1,0,280,1});
-			callScriptMethod("keyEvent",new Object[]{"Boot"});
-			callScriptMethod("setEnvironment",new Object[]{"APK"});
+			callScriptMethod("useItem", new Object[]{0,-1,0,280,1});
+			callScriptMethod("keyEvent", new Object[]{"Boot"});
+			callScriptMethod("setEnvironment", new Object[]{"APK"});
 			org.mozilla.javascript.Context.exit();
         }
-		catch(Exception e){
+		catch (Exception e)
+		{
 			e.printStackTrace();
-			Message msg = new Message();
-			msg.what = MessageType.ACTION_ERRORDIALOG_SHOW;
-			Bundle data = new Bundle();
-			data.putString("error",getExceptionAllinformation(e));
-			msg.setData(data);
-			mHandler.sendMessage(msg);
+			errorNum++;
+			if (errorNum < 5)
+			{
+				Message msg = new Message();
+				msg.what = MessageType.ACTION_ERRORDIALOG_SHOW;
+				Bundle data = new Bundle();
+				data.putString("error", getExceptionAllinformation(e));
+				msg.setData(data);
+				mHandler.sendMessage(msg);
+			}
 		}
 		finally
 		{
@@ -104,78 +110,107 @@ public class JsEngine
             //org.mozilla.javascript.Context.exit();
         }
     }
-	
-	public void typeSomething(String text){
-		callScriptMethod("",new Object[]{text});
+
+	public void typeSomething(String text)
+	{
+		callScriptMethod("", new Object[]{text});
 	}
-	
-	public void callScriptMethod(String name,Object[] params){
-		Context ctx = Context.enter();
-		ctx.setOptimizationLevel(-1);
-		Object obj = scope.get(name, scope);
-		if(obj != null && obj instanceof Function) {
-			Function func = (Function) obj;
-			func.call(ctx, scope, scope, params);
+
+	public void callScriptMethod(String name, Object[] params)
+	{
+		try
+		{
+			Context ctx = Context.enter();
+			ctx.setOptimizationLevel(-1);
+			Object obj = scope.get(name, scope);
+			if (obj != null && obj instanceof Function)
+			{
+				Function func = (Function) obj;
+				func.call(ctx, scope, scope, params);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			errorNum++;
+			if (errorNum < 5)
+			{
+				Message msg = new Message();
+				msg.what = MessageType.ACTION_ERRORDIALOG_SHOW;
+				Bundle data = new Bundle();
+				data.putString("error", getExceptionAllinformation(e));
+				msg.setData(data);
+				mHandler.sendMessage(msg);
+			}
 		}
 	}
-	
-	public int getScreenWidth(){
+
+	public int getScreenWidth()
+	{
 		Context ctx = Context.enter();
 		ctx.setOptimizationLevel(-1);
-		Object o = ScriptableObject.getProperty(scope,"OS.SCREEN_WIDTH");
+		Object o = ScriptableObject.getProperty(scope, "OS.SCREEN_WIDTH");
 		return (int)o;
 	}
-	
-	public int getScreenHeight(){
+
+	public int getScreenHeight()
+	{
 		Context ctx = Context.enter();
 		ctx.setOptimizationLevel(-1);
-		Object o = ScriptableObject.getProperty(scope,"OS.SCREEN_HEIGHT");
+		Object o = ScriptableObject.getProperty(scope, "OS.SCREEN_HEIGHT");
 		return (int)o;
 	}
-	
-	private String getExceptionAllinformation(Exception ex) {  
+
+	private String getExceptionAllinformation(Exception ex)
+	{  
         ByteArrayOutputStream out = new ByteArrayOutputStream();  
         PrintStream pout = new PrintStream(out);  
         ex.printStackTrace(pout);  
         String ret = new String(out.toByteArray());  
         pout.close();  
-        try {  
+        try
+		{  
 			out.close();  
-        } catch (Exception e) {  
+        }
+		catch (Exception e)
+		{  
         }  
         return ret;  
 	}  
-	
-	
+
+
     // 对应类中需要需要被调用的方法，可以做为 JS 代码执行时的回调
-	
+
 	private class MyThread extends Thread implements Runnable
 	{
 
 		private boolean isRun = true;
-		
+
 		@Override
 		public void run() 
 		{
 			super.run();
-			while(isRun){
+			while (isRun)
+			{
 				try
 				{
-					callScriptMethod("modTick",new Object[]{});
+					callScriptMethod("modTick", new Object[]{});
 					this.sleep(50);
 				}
 				catch (InterruptedException e)
 				{
 					e.printStackTrace();
 				}
-				catch(IllegalStateException e){
+				catch (IllegalStateException e)
+				{
 					e.printStackTrace();
 				}
 			}
 		}
-		
-		public void shutdown(){
+
+		public void shutdown()
+		{
 			isRun = false;
 		}
 	}
-	}
+}
