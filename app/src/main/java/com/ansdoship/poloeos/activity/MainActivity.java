@@ -212,6 +212,27 @@ public class MainActivity extends Activity implements View.OnClickListener
 					menuTriggerBt.setVisibility(View.GONE);
 				}
 			});
+		menuBt.setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View p1)
+				{
+					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.menu_layout,null);
+					Button aboutButton = view.findViewById(R.id.menu_layout_about);
+					Button optionButton = view.findViewById(R.id.menu_layout_option);
+					Button helpButton = view.findViewById(R.id.menu_layout_help);
+					aboutButton.setTypeface(tf);
+					optionButton.setTypeface(tf);
+					helpButton.setTypeface(tf);
+					AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+								.setCancelable(true)
+								.setView(view)
+								.create();
+					final Window window = dialog.getWindow();
+					window.setBackgroundDrawable(new ColorDrawable(0));
+					dialog.show();
+				}
+			});
 		unitSize = calculateProperUnitSize();
 		screenView.setUnitSize(unitSize);
 		screenView.setHandler(mHandler);
