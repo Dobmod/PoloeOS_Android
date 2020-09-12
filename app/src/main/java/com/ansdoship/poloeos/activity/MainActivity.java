@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import java.util.zip.*;
 import java.io.*;
 import android.util.Log;
+import android.net.Uri;
+import android.content.Intent;
 
 import com.ansdoship.poloeos.R;
 import com.ansdoship.poloeos.engine.JsEngine;
@@ -37,6 +39,8 @@ import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.graphics.drawable.ColorDrawable;
 import android.view.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 
 public class MainActivity extends Activity implements View.OnClickListener
@@ -46,15 +50,16 @@ public class MainActivity extends Activity implements View.OnClickListener
 	public static String dir = "";
 	public JsEngine mEngine;
 	private TextView textBox;
-	private Button sendBt,upBt,leftBt,rightBt,downBt,enterBt,spaceBt,fBt,qBt,backBt,homeBt,bootBt,menuBt;
-	private Button menuTriggerBt;
+	private Button sendBt,upBt,leftBt,rightBt,downBt,enterBt,spaceBt,fBt,qBt,backBt,homeBt,bootBt,menuBt,menuTriggerBt;
 	private EditText editText;
+	private FrameLayout mainLayout;
 	private LinearLayout panel,menuPanel;
 	private ScreenView screenView;
 	private Typeface tf;
 	private int unitSize;
 	private String[] noteSoundName = {"bdrum","bell","bass","flute","guitar","harp","icechime","pling","snare","xylobone"};
 	private String[] osSoundName = {"click","start","error","noise","beep"};
+	private Bitmap fireWorkPattern;
 
 	private Handler mHandler = new Handler(){
 
@@ -135,7 +140,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 		checkUsing();
 
 		tf = Typeface.createFromFile(MainActivity.dir + "/fonts/Mouse.otf");
+		
 
+		mainLayout = findViewById(R.id.layout_main);
 		textBox = findViewById(R.id.text_box);
 
 		sendBt = findViewById(R.id.bt_send);
@@ -210,6 +217,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					Animation anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_button_in);
 					menuTriggerBt.startAnimation(anim_2);
 					menuTriggerBt.setVisibility(View.GONE);
+					SoundPoolUtil.getInstance().play("os.click",0);
 				}
 			});
 		menuBt.setOnClickListener(new View.OnClickListener(){
@@ -224,6 +232,33 @@ public class MainActivity extends Activity implements View.OnClickListener
 					aboutButton.setTypeface(tf);
 					optionButton.setTypeface(tf);
 					helpButton.setTypeface(tf);
+					aboutButton.setOnClickListener(new View.OnClickListener(){
+
+							@Override
+							public void onClick(View p1)
+							{
+								
+							}
+						});
+					optionButton.setOnClickListener(new View.OnClickListener(){
+
+							@Override
+							public void onClick(View p1)
+							{
+								
+							}
+						});
+					helpButton.setOnClickListener(new View.OnClickListener(){
+
+							@Override
+							public void onClick(View p1)
+							{
+								Uri uri = Uri.parse("https://www.showdoc.com.cn/poloeos");
+								Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+								startActivity(intent);
+								SoundPoolUtil.getInstance().play("os.click",0);
+							}
+						});
 					AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
 								.setCancelable(true)
 								.setView(view)
@@ -231,6 +266,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					final Window window = dialog.getWindow();
 					window.setBackgroundDrawable(new ColorDrawable(0));
 					dialog.show();
+					SoundPoolUtil.getInstance().play("os.click",0);
 				}
 			});
 		unitSize = calculateProperUnitSize();
@@ -269,6 +305,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 							AssetFileDescriptor afd = getAssets().openFd("sounds/os/"+osSoundName[i]+".ogg");
 							SoundPoolUtil.getInstance().loadRF("os."+osSoundName[i],afd);
 						}
+						//贴图
+						fireWorkPattern = BitmapFactory.decodeStream(getAssets().open("firework_pattern.png"));
 					}
 					catch (IOException e)
 					{
@@ -419,6 +457,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 		Bundle data = new Bundle();
 		data.putString("text", "配置文件已释放");
 		msg.setData(data);
+	}
+	
+	public void loadFireworks(){
 	}
 
 	/**
