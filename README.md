@@ -11,7 +11,7 @@ PoloeOS是一个由JavaScript编写的，可以同时在Minecraft中和以apk形
 ![MC中运行](https://s1.ax1x.com/2020/09/12/wUOPoQ.jpg "MC中运行")
 > <center>在MC中运行(ModPE)</center>
 
-![apk运行](https://s1.ax1x.com/2020/09/12/wUqIAJ.jpg "apk运行")
+![apk运行](https://s1.ax1x.com/2020/09/12/wUq8AJ.jpg "apk运行")
 > <center>在APK上运行</center>
 
  这里大概讲一下由来，PoloeOS最初由ModPE写成，后来为了调试方便，专门写了Android软件。Android软件模拟了ModPE的环境，也就是同一个拓展程序在MC上和在APP上运行效果相同。
