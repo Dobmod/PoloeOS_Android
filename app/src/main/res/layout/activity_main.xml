@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-	android:id="@+id/layout_main"
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout_main"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:gravity="center"
 	android:background="#FF444444">
+	
+	<android.opengl.GLSurfaceView
+		android:id="@+id/activity_anim_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"/>
 
 	<com.ansdoship.poloeos.view.ScreenView
 		android:id="@+id/screen_view"
@@ -265,6 +270,7 @@
 		android:paddingBottom="10dp"
 		android:gravity="center"
 		android:layout_gravity="top|right"/>
+
 
 </FrameLayout>
 

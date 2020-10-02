@@ -11,6 +11,9 @@ android {
         versionName "build2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		ndk {
+			abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'
+		}
     }
 
     buildTypes {

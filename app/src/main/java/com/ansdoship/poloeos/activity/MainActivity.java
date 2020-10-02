@@ -41,11 +41,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.*;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLSurfaceView;
+import com.ansdoship.poloeos.box.MyRenderer;
+import javax.microedition.khronos.egl.*;
+import java.lang.reflect.Field;
+
 
 
 public class MainActivity extends Activity implements View.OnClickListener
 {
-
+	
+	private static MainActivity master = null;
 	
 	public static String dir = "";
 	public JsEngine mEngine;
@@ -55,6 +61,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 	private FrameLayout mainLayout;
 	private LinearLayout panel,menuPanel;
 	private ScreenView screenView;
+	private GLSurfaceView animView;
+	private MyRenderer renderer;
 	private Typeface tf;
 	private int unitSize;
 	private String[] noteSoundName = {"bdrum","bell","bass","flute","guitar","harp","icechime","pling","snare","xylobone"};
@@ -73,26 +81,26 @@ public class MainActivity extends Activity implements View.OnClickListener
 					textBox.setVisibility(View.VISIBLE);
 					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.text_box_out);
 					textBox.startAnimation(anim);
-					
+
 					CountDownTimer timer = new CountDownTimer(2000, 2000){
 						@Override
 						public void onTick(long p1)
 						{
 						}
-
+						
 						@Override
 						public void onFinish()
 						{
 							Animation anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.text_box_in);
 							textBox.startAnimation(anim_1);
 							textBox.setVisibility(View.GONE);
-							
+
 						}
 					};
 					timer.start();
 					break;
 				case MessageType.ACTION_ERRORDIALOG_SHOW:
-					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.error_dialog,null);
+					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.error_dialog, null);
 					TextView dialogTitle = view.findViewById(R.id.error_dialog_title),dialogContent = view.findViewById(R.id.error_dialog_content),dialogIntroduction = view.findViewById(R.id.error_dialog_introduction);
 					Button okButton = view.findViewById(R.id.error_dialog_button);
 					dialogTitle.setTypeface(tf);
@@ -112,7 +120,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 							}
 						});
 					dialog.show();
-					SoundPoolUtil.getInstance(). play("os.error",1);
+					SoundPoolUtil.getInstance(). play("os.error", 1);
 					break;
 			}
 		}
@@ -123,24 +131,28 @@ public class MainActivity extends Activity implements View.OnClickListener
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+		if(master!=null){
+			copy(master);
+		}
+		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
-
-		if(Build.VERSION.SDK_INT>=29){
+		setContentView(R.layout.activity_main);
+		
+		if (Build.VERSION.SDK_INT >= 29)
+		{
 			File dirFile = getExternalFilesDir("PoloeOS");
 			dir = dirFile.getPath();
-			if(!dirFile.exists()) dirFile.mkdir();
+			if (!dirFile.exists()) dirFile.mkdir();
 		}
-		else{
-			dir = Environment.getExternalStorageDirectory().getPath()+"/PoloeOS";
+		else
+		{
+			dir = Environment.getExternalStorageDirectory().getPath() + "/PoloeOS";
 		}
 		mCheckPermision();
 		checkUsing();
 
 		tf = Typeface.createFromFile(MainActivity.dir + "/fonts/Mouse.otf");
-		
 
 		mainLayout = findViewById(R.id.layout_main);
 		textBox = findViewById(R.id.text_box);
@@ -158,7 +170,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 		homeBt = findViewById(R.id.bt_home);
 		bootBt = findViewById(R.id.bt_boot);
 		menuBt = findViewById(R.id.bt_menu);
-		
+		animView = findViewById(R.id.activity_anim_view);
+
 		sendBt.setTypeface(tf);
 		upBt.setTypeface(tf);
 		leftBt.setTypeface(tf);
@@ -202,7 +215,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					String text = editText.getEditableText().toString();
 					Level.text = text;
 					mEngine.callScriptMethod("keyEvent", new Object[]{text});
-					SoundPoolUtil.getInstance().play("os.click",0);
+					SoundPoolUtil.getInstance().play("os.click", 0);
 				}
 
 			});
@@ -217,7 +230,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					Animation anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_button_in);
 					menuTriggerBt.startAnimation(anim_2);
 					menuTriggerBt.setVisibility(View.GONE);
-					SoundPoolUtil.getInstance().play("os.click",0);
+					SoundPoolUtil.getInstance().play("os.click", 0);
 				}
 			});
 		menuBt.setOnClickListener(new View.OnClickListener(){
@@ -225,7 +238,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 				@Override
 				public void onClick(View p1)
 				{
-					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.menu_layout,null);
+					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.menu_layout, null);
 					Button aboutButton = view.findViewById(R.id.menu_layout_about);
 					Button optionButton = view.findViewById(R.id.menu_layout_option);
 					Button helpButton = view.findViewById(R.id.menu_layout_help);
@@ -237,7 +250,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 							@Override
 							public void onClick(View p1)
 							{
-								
+
 							}
 						});
 					optionButton.setOnClickListener(new View.OnClickListener(){
@@ -245,7 +258,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 							@Override
 							public void onClick(View p1)
 							{
-								
+
 							}
 						});
 					helpButton.setOnClickListener(new View.OnClickListener(){
@@ -256,17 +269,17 @@ public class MainActivity extends Activity implements View.OnClickListener
 								Uri uri = Uri.parse("https://www.showdoc.com.cn/poloeos");
 								Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 								startActivity(intent);
-								SoundPoolUtil.getInstance().play("os.click",0);
+								SoundPoolUtil.getInstance().play("os.click", 0);
 							}
 						});
 					AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
-								.setCancelable(true)
-								.setView(view)
-								.create();
+						.setCancelable(true)
+						.setView(view)
+						.create();
 					final Window window = dialog.getWindow();
 					window.setBackgroundDrawable(new ColorDrawable(0));
 					dialog.show();
-					SoundPoolUtil.getInstance().play("os.click",0);
+					SoundPoolUtil.getInstance().play("os.click", 0);
 				}
 			});
 		unitSize = calculateProperUnitSize();
@@ -281,6 +294,26 @@ public class MainActivity extends Activity implements View.OnClickListener
 		panel.startAnimation(anim);
 		Animation anim_1 = AnimationUtils.loadAnimation(this, R.anim.screen_out);
 		screenView.startAnimation(anim_1);
+		
+		//Anim View
+		/*
+		animView.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
+				public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
+					// Ensure that we get a 16bit framebuffer. Otherwise, we'll fall
+					// back to Pixelflinger on some device (read: Samsung I7500)
+					int[] attributes = new int[] { EGL10.EGL_DEPTH_SIZE, 16, EGL10.EGL_NONE };
+					EGLConfig[] configs = new EGLConfig[1];
+					int[] result = new int[1];
+					egl.eglChooseConfig(display, attributes, configs, 1, result);
+					return configs[0];
+				}
+			});
+		*/
+		animView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+		animView.setZOrderOnTop(true);  
+		animView.getHolder().setFormat(android.graphics.PixelFormat.TRANSLUCENT); 
+		renderer = new MyRenderer(this,mHandler);
+		animView.setRenderer(renderer);
 		
 		loadResources();
 
@@ -297,13 +330,15 @@ public class MainActivity extends Activity implements View.OnClickListener
 					try
 					{
 						//音效加载
-						for(int i = 0;i<noteSoundName.length;i++){
-							AssetFileDescriptor afd = getAssets().openFd("sounds/note/"+noteSoundName[i]+".ogg");
-							SoundPoolUtil.getInstance().loadRF("note."+noteSoundName[i],afd);
+						for (int i = 0;i < noteSoundName.length;i++)
+						{
+							AssetFileDescriptor afd = getAssets().openFd("sounds/note/" + noteSoundName[i] + ".ogg");
+							SoundPoolUtil.getInstance().loadRF("note." + noteSoundName[i], afd);
 						}
-						for(int i = 0;i<osSoundName.length;i++){
-							AssetFileDescriptor afd = getAssets().openFd("sounds/os/"+osSoundName[i]+".ogg");
-							SoundPoolUtil.getInstance().loadRF("os."+osSoundName[i],afd);
+						for (int i = 0;i < osSoundName.length;i++)
+						{
+							AssetFileDescriptor afd = getAssets().openFd("sounds/os/" + osSoundName[i] + ".ogg");
+							SoundPoolUtil.getInstance().loadRF("os." + osSoundName[i], afd);
 						}
 						//贴图
 						fireWorkPattern = BitmapFactory.decodeStream(getAssets().open("firework_pattern.png"));
@@ -321,7 +356,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		/**
 		 * 请求授权
 		 */
-		if(Build.VERSION.SDK_INT<=21) return;
+		if (Build.VERSION.SDK_INT <= 21) return;
 		if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
 		{ //表示未授权时
             //进行授权
@@ -384,20 +419,21 @@ public class MainActivity extends Activity implements View.OnClickListener
 				break;
 			case R.id.bt_boot:
 				words = "Boot";
-				SoundPoolUtil.getInstance().play("os.beep",0);
+				SoundPoolUtil.getInstance().play("os.beep", 0);
 				break;
 			case R.id.bt_menu:
 				break;
 			default:
 		}
 		mEngine.callScriptMethod("keyEvent", new Object[]{words});
-		SoundPoolUtil.getInstance().play("os.click",0);
+		SoundPoolUtil.getInstance().play("os.click", 0);
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if(menuPanel.getVisibility()==View.VISIBLE){
+		if (menuPanel.getVisibility() == View.VISIBLE)
+		{
 			Animation anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_in);
 			menuPanel.startAnimation(anim_1);
 			menuPanel.setVisibility(View.GONE);
@@ -414,7 +450,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		try
 		{
 			version = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-			Log.i("MainActivity","versionCode:"+version);
+			Log.i("MainActivity", "versionCode:" + version);
 		}
 		catch (PackageManager.NameNotFoundException e)
 		{
@@ -458,8 +494,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 		data.putString("text", "配置文件已释放");
 		msg.setData(data);
 	}
-	
-	public void loadFireworks(){
+
+	public void loadFireworks()
+	{
 	}
 
 	/**
@@ -530,24 +567,26 @@ public class MainActivity extends Activity implements View.OnClickListener
 		}
 	}
 
-
 	@Override
-	protected void onSaveInstanceState(Bundle outState)
+	protected void onResume()
 	{
-		// TODO: Implement this method
-		super.onSaveInstanceState(outState);
-		mEngine.shutdown();
-		finish();
+		super.onResume();
+		animView.onResume();
 	}
 
 	@Override
-	public void onBackPressed()
+	protected void onPause()
 	{
-		super.onBackPressed();
-		mEngine.shutdown();
-		finish();
+		super.onPause();
+		animView.onPause();
 	}
 
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		mEngine.shutdown();
+	}
 
 
 	private int calculateProperUnitSize()
@@ -563,7 +602,27 @@ public class MainActivity extends Activity implements View.OnClickListener
 		mEngine = new JsEngine(this);
 		mEngine.setHandler(mHandler);
 		mEngine.request();
-		
+
+	}
+	
+	private void copy(Object src) {
+		try {
+			Field[] fs = src.getClass().getDeclaredFields();
+			for (Field f : fs) {
+				f.setAccessible(true);
+				f.set(this, f.get(src));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public MainActivity getMaster(){
+		return master;
+	}
+	
+	public void setMaster(){
+		master = MainActivity.this;
 	}
 
 	public static String getBarnDir()

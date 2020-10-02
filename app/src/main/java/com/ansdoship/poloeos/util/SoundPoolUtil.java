@@ -246,6 +246,7 @@ public class SoundPoolUtil
 			{
 //                LogUtils.d(TAG, "name:" + idCache.get(name));
                 streamId = mSoundPool.play(idCache.get(name), leftVolume, rightVolume, property, times, rate);
+				mSoundPool.setRate(streamId,rate);
 //                LogUtils.d(TAG, "streadmId:" + streamId);
                 sidCache.add(streamId);
             }

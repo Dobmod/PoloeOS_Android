@@ -63,7 +63,7 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 	public void surfaceDestroyed(SurfaceHolder holder)
 	{
 		mIsRunning = false;
-		mScreen.destroyed();
+		//mScreen.destroyed();
 	}
 	
 	public void setUnitSize(int size){

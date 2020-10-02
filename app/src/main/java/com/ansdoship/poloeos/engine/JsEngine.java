@@ -54,9 +54,8 @@ public class JsEngine
 
 	public void shutdown()
 	{
-		callScriptMethod("leaveGame", new Object[]{});
 		modTickThread.shutdown();
-		System.exit(0);
+		callScriptMethod("leaveGame", new Object[]{});
 	}
 
     private void initJsEngine()
@@ -85,6 +84,7 @@ public class JsEngine
 			Object x = rhino.evaluateString(scope, jsCode, clazz.getSimpleName(), 1, null);
 			//script.exec(rhino,scope);
 			modTickThread.start();
+			
 			callScriptMethod("useItem", new Object[]{0,-1,0,280,1});
 			callScriptMethod("keyEvent", new Object[]{"Boot"});
 			callScriptMethod("setEnvironment", new Object[]{"APK"});
@@ -106,8 +106,7 @@ public class JsEngine
 		}
 		finally
 		{
-            //退出
-            //org.mozilla.javascript.Context.exit();
+			org.mozilla.javascript.Context.exit();
         }
     }
 
