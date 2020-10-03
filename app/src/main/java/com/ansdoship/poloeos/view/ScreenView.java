@@ -6,6 +6,8 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.os.Handler;
+import com.ansdoship.poloeos.util.MessageUtil;
+import com.ansdoship.poloeos.util.MessageType;
 
 public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, Runnable
 {
@@ -15,6 +17,8 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 	private ScreenEntity mScreen;
 	private Thread mThread;
 	public static Handler mHandler;
+	
+	private int fps=  0,sharedFps = 0;
 	
 	private int width,height;
 
@@ -81,18 +85,21 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 	public int getScreenHeight(){
 		return mScreen.getScreenHeight();
 	}
+	
+	public int getCurrentFps(){
+		return this.sharedFps;
+	}
 
 	@Override
 	public void run()
 	{
-		long start = System.currentTimeMillis();
-
 		while (mIsRunning)
 		{
 			draw();
 		}
 	}
 
+	long time = 0;
 	private void draw()
 	{
 		mCanvas = mHolder.lockCanvas();
@@ -101,6 +108,13 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 			try
 			{
 				mScreen.draw(mCanvas);
+				if(System.currentTimeMillis()-time>=1000){
+					sharedFps = fps;
+					fps = 0;
+					time = System.currentTimeMillis();
+					MessageUtil.sendMessage(mHandler,MessageType.ACTION_FPS_UPDATE);
+				}
+				fps++;
 			}
 			catch (Exception e)
 			{

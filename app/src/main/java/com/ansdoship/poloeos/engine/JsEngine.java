@@ -23,6 +23,7 @@ import com.ansdoship.poloeos.util.*;
 import android.os.Bundle;
 import android.os.Handler;
 import java.io.*;
+import android.os.CountDownTimer;
 
 public class JsEngine
 {
@@ -70,8 +71,8 @@ public class JsEngine
         rhino.setOptimizationLevel(-1);
         try
 		{
-			Reader reader = new FileReader(new File(MainActivity.dir + "/poloeos.js"));
-			Script script = rhino.compileReader(reader, "poloeos.js", 0, null);
+			//Reader reader = new FileReader(new File(MainActivity.dir + "/poloeos.js"));
+			Script script = rhino.compileString(jsCode, "poloeos.js", 0, null);
             scope = rhino.initStandardObjects();
             // 这两句是设置当前的类做为上下文以及获取当前的类加载器，以便于 rhino 通过反射获取档期类
             ScriptableObject.putProperty(scope, "javaContext", org.mozilla.javascript.Context.javaToJS(this, scope));
@@ -81,14 +82,14 @@ public class JsEngine
 			ScriptableObject.defineClass(scope, Player.class);
 			ScriptableObject.defineClass(scope, Block.class);
             //执行 js 代码
-			Object x = rhino.evaluateString(scope, jsCode, clazz.getSimpleName(), 1, null);
-			//script.exec(rhino,scope);
-			modTickThread.start();
+			//Object x = rhino.evaluateString(scope, jsCode, clazz.getSimpleName(), 1, null);
+			script.exec(rhino, scope);
 			
+			modTickThread.start();
+
 			callScriptMethod("useItem", new Object[]{0,-1,0,280,1});
 			callScriptMethod("keyEvent", new Object[]{"Boot"});
 			callScriptMethod("setEnvironment", new Object[]{"APK"});
-			org.mozilla.javascript.Context.exit();
         }
 		catch (Exception e)
 		{
@@ -142,6 +143,10 @@ public class JsEngine
 				mHandler.sendMessage(msg);
 			}
 		}
+		finally
+		{
+			org.mozilla.javascript.Context.exit();
+		}
 	}
 
 	public int getScreenWidth()
@@ -184,6 +189,9 @@ public class JsEngine
 	{
 
 		private boolean isRun = true;
+		private long time = 0;
+		private long delayTime = 50;
+		private int counter = 20,ticks = 19;
 
 		@Override
 		public void run() 
@@ -193,8 +201,32 @@ public class JsEngine
 			{
 				try
 				{
+					
+					if (ticks < 20)
+					{
+						if (delayTime > 1) delayTime--;
+					}
+					if (ticks > 20)
+					{
+						delayTime++;
+					}
+					if (ticks == 20)
+					{
+						delayTime++;
+					}
+					
 					callScriptMethod("modTick", new Object[]{});
-					this.sleep(50);
+					counter++;
+
+					if (System.currentTimeMillis() - time >= 1000)
+					{
+						ticks = Integer.parseInt(String.valueOf(counter));
+						counter =  0;
+						time =  System.currentTimeMillis();
+					}
+					
+					this.sleep(delayTime);
+
 				}
 				catch (InterruptedException e)
 				{

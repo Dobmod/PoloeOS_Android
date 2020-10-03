@@ -6,7 +6,7 @@
 	android:layout_height="match_parent"
 	android:gravity="center"
 	android:background="#FF444444">
-	
+
 	<android.opengl.GLSurfaceView
 		android:id="@+id/activity_anim_view"
 		android:layout_width="match_parent"
@@ -271,6 +271,16 @@
 		android:gravity="center"
 		android:layout_gravity="top|right"/>
 
+	<TextView
+		android:id="@+id/text_fps"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="0"
+		android:textColor="#FFFFFFFF"
+		android:textSize="10sp"
+		android:layout_gravity="bottom|left"
+		android:gravity="center"
+		android:layout_margin="2dp"/>
 
 </FrameLayout>
 

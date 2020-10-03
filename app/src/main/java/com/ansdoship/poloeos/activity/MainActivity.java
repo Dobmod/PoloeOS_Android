@@ -54,8 +54,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 	private static MainActivity master = null;
 	
 	public static String dir = "";
+	private boolean isOpen3d = false;
 	public JsEngine mEngine;
-	private TextView textBox;
+	private TextView textBox,textFps;
 	private Button sendBt,upBt,leftBt,rightBt,downBt,enterBt,spaceBt,fBt,qBt,backBt,homeBt,bootBt,menuBt,menuTriggerBt;
 	private EditText editText;
 	private FrameLayout mainLayout;
@@ -122,6 +123,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 					dialog.show();
 					SoundPoolUtil.getInstance(). play("os.error", 1);
 					break;
+				case MessageType.ACTION_FPS_UPDATE:
+					textFps.setText(String.valueOf(screenView.getCurrentFps()));
+					break;
 			}
 		}
 
@@ -156,7 +160,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 
 		mainLayout = findViewById(R.id.layout_main);
 		textBox = findViewById(R.id.text_box);
-
+		textFps = findViewById(R.id.text_fps);
+		
 		sendBt = findViewById(R.id.bt_send);
 		upBt = findViewById(R.id.bt_up);
 		leftBt = findViewById(R.id.bt_left);
@@ -312,8 +317,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		animView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 		animView.setZOrderOnTop(true);  
 		animView.getHolder().setFormat(android.graphics.PixelFormat.TRANSLUCENT); 
-		renderer = new MyRenderer(this,mHandler);
-		animView.setRenderer(renderer);
+		open3dView(false);
 		
 		loadResources();
 
@@ -499,6 +503,12 @@ public class MainActivity extends Activity implements View.OnClickListener
 	{
 	}
 
+	
+	public void open3dView(boolean is){
+		isOpen3d = is;
+		renderer = new MyRenderer(this,mHandler,is);
+		animView.setRenderer(renderer);
+	}
 	/**
 	 * 从assets中解压zip文件的方法
 	 *
@@ -571,15 +581,36 @@ public class MainActivity extends Activity implements View.OnClickListener
 	protected void onResume()
 	{
 		super.onResume();
-		animView.onResume();
+		if(isOpen3d) animView.onResume();
 	}
 
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-		animView.onPause();
+		if(isOpen3d) animView.onPause();
 	}
+
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+	}
+
+	long time_1 = 0;
+	@Override
+	public void onBackPressed()
+	{
+		if(System.currentTimeMillis()-time_1<1500){
+			mEngine.shutdown();
+			finish();
+			System.exit(0);
+		}
+		else{
+			time_1 = System.currentTimeMillis();
+		}
+	}
+	
 
 	@Override
 	protected void onDestroy()
