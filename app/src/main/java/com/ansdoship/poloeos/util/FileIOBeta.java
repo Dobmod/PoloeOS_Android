@@ -1,6 +1,5 @@
 package com.ansdoship.poloeos.util;
 
-
 import android.content.res.Resources;
 
 import com.ansdoship.poloeos.activity.MainActivity;
@@ -15,7 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-public class FileIO
+public class FileIOBeta
 {
 
 	public static String getBarnDir()

@@ -78,6 +78,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 			switch (msg.what)
 			{
 				case  MessageType.ACTION_TEXTBOX_SHOW:
+					MessageUtil.sendMessage(renderer.getHandler(),MessageType.ACTION_LAMP_ON);
 					textBox.setText(msg.getData().getString("text"));
 					textBox.setVisibility(View.VISIBLE);
 					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.text_box_out);
@@ -95,7 +96,6 @@ public class MainActivity extends Activity implements View.OnClickListener
 							Animation anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.text_box_in);
 							textBox.startAnimation(anim_1);
 							textBox.setVisibility(View.GONE);
-
 						}
 					};
 					timer.start();
@@ -301,23 +301,10 @@ public class MainActivity extends Activity implements View.OnClickListener
 		screenView.startAnimation(anim_1);
 		
 		//Anim View
-		/*
-		animView.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
-				public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
-					// Ensure that we get a 16bit framebuffer. Otherwise, we'll fall
-					// back to Pixelflinger on some device (read: Samsung I7500)
-					int[] attributes = new int[] { EGL10.EGL_DEPTH_SIZE, 16, EGL10.EGL_NONE };
-					EGLConfig[] configs = new EGLConfig[1];
-					int[] result = new int[1];
-					egl.eglChooseConfig(display, attributes, configs, 1, result);
-					return configs[0];
-				}
-			});
-		*/
 		animView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 		animView.setZOrderOnTop(true);  
 		animView.getHolder().setFormat(android.graphics.PixelFormat.TRANSLUCENT); 
-		open3dView(false);
+		open3dView(true);
 		
 		loadResources();
 
@@ -465,7 +452,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		{
 			//第一次使用
 
-			if (barnFile.exists()) FileIO.delAllFile(dir);
+			if (barnFile.exists()) FileIOBeta.delAllFile(dir);
 			releaseConfFile();
 		}
 		else
@@ -479,7 +466,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 			{
 				if (version > pref.getInt("version", 0))
 				{
-					FileIO.delAllFile(dir);
+					FileIOBeta.delAllFile(dir);
 					releaseConfFile();
 				}
 			}

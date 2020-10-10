@@ -22,12 +22,9 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	private FrameBuffer fb = null;
 	private String[] textures = {"lamp_on","lamp_off","firework_pattern"};
 	
-	private ArrayList<Object3D> fireworkList = new ArrayList<>();
-	private ArrayList<Float> kList = new ArrayList<>();
 	private World world;
 	private Light sun;
 	private Object3D cube = null;
-	private Ticker ticker = new Ticker(20);
 	
 	private boolean isScaled = false;
 	
@@ -96,10 +93,7 @@ public class MyRenderer implements GLSurfaceView.Renderer
 				e.printStackTrace();
 			}
 			
-			cube = createFirework();
-			world.addObject(cube);
-			
-			
+			createBox();		
 
 			Camera cam = world.getCamera();
 			cam.moveCamera(Camera.CAMERA_MOVEOUT, 50);
@@ -107,20 +101,13 @@ public class MyRenderer implements GLSurfaceView.Renderer
 
 			SimpleVector sv = new SimpleVector();
 			sv.set(cube.getTransformedCenter());
-			world.removeObject(cube);
 			sv.z -= 100;
 			sun.setPosition(sv);
 			MemoryHelper.compact();
 			
-			for(int i = 0;i<0;i++){
-				Object3D obj = createFirework();
-				int tX = (int)(Math.random()*100)-50;
-				kList.add((float)Math.random()*6);
-				obj.setOrigin(getPoint(tX,0,0));
-				obj.rotateY(3.1415f);
-				world.addObject(obj);
-				fireworkList.add(obj);
-			}
+			SimpleVector vector = cube.getOrigin();
+			vector.x -= 20;
+			cube.setOrigin(vector);
 
 			if (activity.getMaster() == null)
 			{
@@ -134,6 +121,7 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	{
 		fb.clear(new RGBColor(0, 0, 0, 0));
 		if(!isOpen) return;
+		cube.rotateY(0.007f);
 		world.renderScene(fb);
 		world.draw(fb);
 		fb.display();

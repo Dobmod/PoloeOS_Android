@@ -10,7 +10,7 @@ import android.app.Activity;
 import android.widget.EditText;
 
 import com.ansdoship.poloeos.modpe.*;
-import com.ansdoship.poloeos.util.FileIO;
+import com.ansdoship.poloeos.util.FileIOBeta;
 import com.ansdoship.poloeos.view.ScreenEntity;
 
 import java.io.File;
@@ -42,8 +42,8 @@ public class JsEngine
 	{
 		this.context = ctx;
         this.clazz = JsEngine.class;
-		this.testCode = FileIO.getFromAssets(ctx.getResources(), "conf.js");
-		this.code = FileIO.readLocalFile(MainActivity.dir + "/poloeos.js");
+		this.testCode = FileIOBeta.getFromAssets(ctx.getResources(), "conf.js");
+		this.code = FileIOBeta.readLocalFile(MainActivity.dir + "/poloeos.js");
 		this.modTickThread = new MyThread();
         initJsEngine();
     }
