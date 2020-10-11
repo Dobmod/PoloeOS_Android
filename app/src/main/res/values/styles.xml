@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="AppTheme" parent="@android:style/Theme.Holo.Light">
+		<item name="android:colorAccent">#FFFFFF</item>
+		<item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowBackground">@color/backgroundColor</item>
 	</style>
 </resources>

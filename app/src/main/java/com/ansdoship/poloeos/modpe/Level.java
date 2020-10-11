@@ -17,7 +17,7 @@ public class Level extends ScriptableObject
 	@JSStaticFunction
 	public static void playSound(int x,int y,int z,String name,int volume,double rate){
 		
-		SoundPoolUtil.getInstance().play(name,0,Float.parseFloat(String.valueOf((Math.pow(2,(rate-13d)/12d)))));
+		SoundPoolUtils.getInstance().play(name,0,Float.parseFloat(String.valueOf((Math.pow(2,(rate-13d)/12d)))));
 	}
 	
 	@Override

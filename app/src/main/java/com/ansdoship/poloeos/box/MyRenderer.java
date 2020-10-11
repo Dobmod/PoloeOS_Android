@@ -10,8 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 import com.ansdoship.poloeos.R;
 import java.io.IOException;
-import com.ansdoship.poloeos.util.MessageType;
 import java.util.ArrayList;
+import com.ansdoship.poloeos.util.MessageUtils;
 
 public class MyRenderer implements GLSurfaceView.Renderer
 {
@@ -42,12 +42,12 @@ public class MyRenderer implements GLSurfaceView.Renderer
 			public void handleMessage(Message msg)
 			{
 				switch(msg.what){
-					case MessageType.ACTION_LAMP_ON:
+					case MessageUtils.MessageType.ACTION_LAMP_ON:
 						if(cube!=null){
 							cube.setTexture("lamp_on");
 						}
 						break;
-					case MessageType.ACTION_LAMP_GONE:
+					case MessageUtils.MessageType.ACTION_LAMP_GONE:
 						isScaled = true;
 						break;
 				}

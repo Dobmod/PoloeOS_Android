@@ -14,7 +14,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.annotations.JSStaticFunction;
 import android.widget.TextView;
 import android.os.Message;
-import com.ansdoship.poloeos.util.*;
+import com.ansdoship.poloeos.util.MessageUtils;
 import android.os.Bundle;
 
 public class ScreenEntity extends ScriptableObject
@@ -95,7 +95,7 @@ public class ScreenEntity extends ScriptableObject
 	@JSStaticFunction
 	public static void clientMessage(String text){
 		Message msg = new Message();
-		msg.what = MessageType.ACTION_TEXTBOX_SHOW;
+		msg.what = MessageUtils.MessageType.ACTION_TEXTBOX_SHOW;
 		Bundle data = new Bundle();
 		data.putString("text",text);
 		msg.setData(data);

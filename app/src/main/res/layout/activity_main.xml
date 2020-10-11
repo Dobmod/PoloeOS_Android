@@ -17,7 +17,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="top|center_horizontal"
-		android:layout_marginTop="5dp"/>
+		android:layout_marginTop="1dp"/>
 
 	<LinearLayout
 		android:id="@+id/button_panel"
@@ -33,31 +33,32 @@
 			android:layout_width="280dp"
 			android:orientation="horizontal"
 			android:layout_marginTop="5dp"
-			android:gravity="center_vertical"
+			android:gravity="center"
 			android:layout_marginLeft="20dp"
 			android:layout_marginRight="20dp">
 
 			<EditText
 				android:id="@+id/something"
 				android:layout_height="wrap_content"
-				android:layout_width="0dp"
+				android:layout_width="224dp"
 				android:background="@drawable/text_edit"
 				android:maxLines="1"
 				android:textColor="#FFFFFFFF"
-				android:layout_weight="4.0"
-				android:layout_margin="1dp"/>
+				android:layout_marginLeft="1dp"
+				android:gravity="left|center_vertical"/>
 
 			<Button
 				android:id="@+id/bt_send"
 				android:layout_height="wrap_content"
-				android:layout_width="0dp"
+				android:layout_width="54dp"
 				android:text="Send"
 				android:background="@drawable/button_style"
 				android:textColor="#FFFFFFFF"
 				android:textStyle="bold"
 				android:gravity="center"
-				android:layout_margin="1dp"
-				android:layout_weight="1.0"/>
+				android:layout_marginRight="1dp"
+				android:layout_marginTop="1dp"
+				android:layout_marginBottom="1dp"/>
 
 		</LinearLayout>
 
@@ -66,7 +67,6 @@
 			android:layout_width="280dp"
 			android:orientation="horizontal"
 			android:gravity="center"
-			android:layout_marginTop="2dp"
 			android:layout_marginLeft="20dp"
 			android:layout_marginRight="20dp">
 
@@ -207,15 +207,23 @@
 	<LinearLayout
 		android:id="@+id/menu_panel"
 		android:layout_height="wrap_content"
-		android:layout_width="120dp"
-		android:orientation="horizontal"
+		android:layout_width="wrap_content"
 		android:layout_gravity="top|left"
 		android:background="@drawable/dialog_background"
-		android:paddingTop="5dp"
-		android:paddingRight="10dp"
-		android:paddingLeft="10dp"
-		android:paddingBottom="5dp"
-		android:visibility="gone">
+		android:padding="5dp"
+		android:layout_margin="1dp"
+		android:orientation="horizontal">
+
+		<Button
+			android:id="@+id/bt_menu_trigger"
+			android:layout_height="wrap_content"
+			android:layout_width="54dp"
+			android:layout_margin="1dp"
+			android:text="More"
+			android:background="@drawable/button_style"
+			android:textColor="#FFFFFFFF"
+			android:textStyle="bold"
+			android:gravity="center"/>
 
 		<Button
 			android:id="@+id/bt_menu"
@@ -226,34 +234,22 @@
 			android:textStyle="bold"
 			android:gravity="center"
 			android:layout_margin="1dp"
-			android:layout_width="0dp"
-			android:layout_weight="1.0"/>
+			android:layout_width="54dp"
+			android:visibility="gone"/>
 
 		<Button
 			android:id="@+id/bt_boot"
 			android:layout_height="wrap_content"
-			android:layout_width="0dp"
+			android:layout_width="54dp"
 			android:text="Boot"
 			android:background="@drawable/button_style"
 			android:textColor="#FFFFFFFF"
 			android:textStyle="bold"
 			android:gravity="center"
 			android:layout_margin="1dp"
-			android:layout_weight="1.0"/>
+			android:visibility="gone"/>
 
 	</LinearLayout>
-
-	<Button
-		android:id="@+id/menu_trigger"
-		android:layout_height="30dp"
-		android:layout_width="25dp"
-		android:text="..."
-		android:background="@drawable/grey_button_style"
-		android:textColor="#FFFFFFFF"
-		android:textStyle="bold"
-		android:gravity="center"
-		android:visibility="visible"
-		android:padding="1dp"/>
 
 	<TextView
 		android:id="@+id/text_box"
@@ -269,7 +265,8 @@
 		android:paddingTop="10dp"
 		android:paddingBottom="10dp"
 		android:gravity="center"
-		android:layout_gravity="top|right"/>
+		android:layout_gravity="top|right"
+		android:layout_margin="1dp"/>
 
 	<TextView
 		android:id="@+id/text_fps"

@@ -10,7 +10,7 @@ import android.app.Activity;
 import android.widget.EditText;
 
 import com.ansdoship.poloeos.modpe.*;
-import com.ansdoship.poloeos.util.FileIOBeta;
+import com.ansdoship.poloeos.util.FileUtils;
 import com.ansdoship.poloeos.view.ScreenEntity;
 
 import java.io.File;
@@ -19,13 +19,15 @@ import java.io.Reader;
 import com.ansdoship.poloeos.activity.MainActivity;
 import android.widget.Toast;
 import android.os.Message;
-import com.ansdoship.poloeos.util.*;
+import com.ansdoship.poloeos.util.FileUtils;
 import android.os.Bundle;
 import android.os.Handler;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
 import android.os.CountDownTimer;
+import com.ansdoship.poloeos.util.MessageUtils;
+import java.io.PrintStream;
 
-public class JsEngine
+public class JSEngine
 {
     private Class clazz;
     private org.mozilla.javascript.Context rhino;
@@ -38,14 +40,14 @@ public class JsEngine
     private String jsCode = "";
     private String testCode;
 	private String code = "";
-    public JsEngine(Activity ctx)
+    public JSEngine(Activity ctx)
 	{
 		this.context = ctx;
-        this.clazz = JsEngine.class;
-		this.testCode = FileIOBeta.getFromAssets(ctx.getResources(), "conf.js");
-		this.code = FileIOBeta.readLocalFile(MainActivity.dir + "/poloeos.js");
+        this.clazz = JSEngine.class;
+		this.testCode = FileUtils.getFromAssets(ctx.getResources(), "conf.js");
+		this.code = FileUtils.readLocalFile(MainActivity.dir + "/poloeos.js");
 		this.modTickThread = new MyThread();
-        initJsEngine();
+        initJSEngine();
     }
 
 	public void setHandler(Handler h)
@@ -59,7 +61,7 @@ public class JsEngine
 		callScriptMethod("leaveGame", new Object[]{});
 	}
 
-    private void initJsEngine()
+    private void initJSEngine()
 	{
         //jsCode = "var ScriptAPI = java.lang.Class.forName(\"" + JsEngine.class.getName() + "\", true, javaLoader);\n"+ testCode + code + "";
 		jsCode = "var barnDir = \"" + MainActivity.dir + "\";\n" + testCode + "\n" + code + "\nfunction keyEvent(word){OS.keyEvent(word);}";
@@ -98,7 +100,7 @@ public class JsEngine
 			if (errorNum < 5)
 			{
 				Message msg = new Message();
-				msg.what = MessageType.ACTION_ERRORDIALOG_SHOW;
+				msg.what = MessageUtils.MessageType.ACTION_ERRORDIALOG_SHOW;
 				Bundle data = new Bundle();
 				data.putString("error", getExceptionAllinformation(e));
 				msg.setData(data);
@@ -136,7 +138,7 @@ public class JsEngine
 			if (errorNum < 5)
 			{
 				Message msg = new Message();
-				msg.what = MessageType.ACTION_ERRORDIALOG_SHOW;
+				msg.what = MessageUtils.MessageType.ACTION_ERRORDIALOG_SHOW;
 				Bundle data = new Bundle();
 				data.putString("error", getExceptionAllinformation(e));
 				msg.setData(data);

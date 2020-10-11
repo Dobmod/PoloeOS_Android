@@ -12,17 +12,17 @@ import java.util.Set;
 import android.content.res.AssetFileDescriptor;
 import android.content.Context;
 
-public class SoundPoolUtil
+public class SoundPoolUtils
 {
 
-    private static final String TAG = SoundPoolUtil.class.getSimpleName();
-    private static SoundPoolUtil mSound;
+    private static final String TAG = SoundPoolUtils.class.getSimpleName();
+    private static SoundPoolUtils mSound;
     private SoundPool mSoundPool;
     private boolean isLoadC = false;
     private Map<String, Integer> idCache;
     private List<Integer> sidCache;
 
-    private SoundPoolUtil()
+    private SoundPoolUtils()
 	{
         idCache = new HashMap<>();
         sidCache = new ArrayList<>();
@@ -45,14 +45,14 @@ public class SoundPoolUtil
         mSoundPool.setOnLoadCompleteListener(new MyOnLoadCompleteListener());
     }
 
-    public static SoundPoolUtil getInstance()
+    public static SoundPoolUtils getInstance()
 	{
 
-        synchronized (SoundPoolUtil.class)
+        synchronized (SoundPoolUtils.class)
 		{
             if (mSound == null)
 			{
-                mSound = new SoundPoolUtil();
+                mSound = new SoundPoolUtils();
             }
         }
         return mSound;

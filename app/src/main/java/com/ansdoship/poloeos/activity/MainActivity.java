@@ -15,21 +15,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import java.util.zip.*;
-import java.io.*;
+import java.io.File;
 import android.util.Log;
 import android.net.Uri;
 import android.content.Intent;
 
 import com.ansdoship.poloeos.R;
-import com.ansdoship.poloeos.engine.JsEngine;
+import com.ansdoship.poloeos.engine.JSEngine;
 import com.ansdoship.poloeos.modpe.Level;
 import com.ansdoship.poloeos.view.ScreenView;
 import android.widget.TextView;
 import android.os.Handler;
 import android.os.Message;
 import android.os.CountDownTimer;
-import com.ansdoship.poloeos.util.MessageType;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.Manifest;
@@ -38,13 +36,13 @@ import android.content.res.AssetFileDescriptor;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.graphics.drawable.ColorDrawable;
-import android.view.*;
+import android.view.MotionEvent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import com.ansdoship.poloeos.box.MyRenderer;
-import javax.microedition.khronos.egl.*;
 import java.lang.reflect.Field;
+import java.io.IOException;
 
 
 
@@ -55,7 +53,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 	
 	public static String dir = "";
 	private boolean isOpen3d = false;
-	public JsEngine mEngine;
+	public JSEngine mEngine;
 	private TextView textBox,textFps;
 	private Button sendBt,upBt,leftBt,rightBt,downBt,enterBt,spaceBt,fBt,qBt,backBt,homeBt,bootBt,menuBt,menuTriggerBt;
 	private EditText editText;
@@ -77,8 +75,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 		{
 			switch (msg.what)
 			{
-				case  MessageType.ACTION_TEXTBOX_SHOW:
-					MessageUtil.sendMessage(renderer.getHandler(),MessageType.ACTION_LAMP_ON);
+				case MessageUtils.MessageType.ACTION_TEXTBOX_SHOW:
+					MessageUtils.sendMessage(renderer.getHandler(),MessageUtils.MessageType.ACTION_LAMP_ON);
 					textBox.setText(msg.getData().getString("text"));
 					textBox.setVisibility(View.VISIBLE);
 					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.text_box_out);
@@ -100,7 +98,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					};
 					timer.start();
 					break;
-				case MessageType.ACTION_ERRORDIALOG_SHOW:
+				case MessageUtils.MessageType.ACTION_ERRORDIALOG_SHOW:
 					View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.error_dialog, null);
 					TextView dialogTitle = view.findViewById(R.id.error_dialog_title),dialogContent = view.findViewById(R.id.error_dialog_content),dialogIntroduction = view.findViewById(R.id.error_dialog_introduction);
 					Button okButton = view.findViewById(R.id.error_dialog_button);
@@ -110,8 +108,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					okButton.setTypeface(tf);
 					dialogContent.setText(msg.getData().getString("error"));
 					final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(view).setCancelable(false). create();
-					final Window window = dialog.getWindow();
-					window.setBackgroundDrawable(new ColorDrawable(0));
+					dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
 					okButton.setOnClickListener(new View.OnClickListener(){
 
 							@Override
@@ -121,9 +118,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 							}
 						});
 					dialog.show();
-					SoundPoolUtil.getInstance(). play("os.error", 1);
+					SoundPoolUtils.getInstance(). play("os.error", 1);
 					break;
-				case MessageType.ACTION_FPS_UPDATE:
+				case MessageUtils.MessageType.ACTION_FPS_UPDATE:
 					textFps.setText(String.valueOf(screenView.getCurrentFps()));
 					break;
 			}
@@ -191,6 +188,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		bootBt.setTypeface(tf);
 		menuBt.setTypeface(tf);
 
+		textFps.setTypeface(tf);
 		textBox.setTypeface(tf);
 
 		upBt.setOnClickListener(this);
@@ -210,7 +208,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		screenView = findViewById(R.id.screen_view);
 		panel = findViewById(R.id.button_panel);
 		menuPanel = findViewById(R.id.menu_panel);
-		menuTriggerBt = findViewById(R.id.menu_trigger);
+		menuTriggerBt = findViewById(R.id.bt_menu_trigger);
 		menuTriggerBt.setTypeface(tf);
 		sendBt.setOnClickListener(new View.OnClickListener(){
 
@@ -220,7 +218,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 					String text = editText.getEditableText().toString();
 					Level.text = text;
 					mEngine.callScriptMethod("keyEvent", new Object[]{text});
-					SoundPoolUtil.getInstance().play("os.click", 0);
+					SoundPoolUtils.getInstance().play("os.click", 0);
 				}
 
 			});
@@ -229,17 +227,38 @@ public class MainActivity extends Activity implements View.OnClickListener
 				@Override
 				public void onClick(View p1)
 				{
-					menuPanel.setVisibility(View.VISIBLE);
-					Animation anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_out);
-					menuPanel.startAnimation(anim_1);
-					Animation anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_button_in);
-					menuTriggerBt.startAnimation(anim_2);
-					menuTriggerBt.setVisibility(View.GONE);
-					SoundPoolUtil.getInstance().play("os.click", 0);
+					Animation anim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_in);
+					menuPanel.setAnimation(anim);
+					anim.setAnimationListener(new Animation.AnimationListener() {
+							@Override
+							public void onAnimationStart(Animation p1)
+							{
+								SoundPoolUtils.getInstance().play("os.click", 0);
+							}
+							@Override
+							public void onAnimationEnd(Animation p1)
+							{
+								if (menuTriggerBt.getText().equals("More")) {
+									menuTriggerBt.setText("Close");
+									menuBt.setVisibility(View.VISIBLE);
+									bootBt.setVisibility(View.VISIBLE);
+									menuPanel.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_out));
+								}
+								else {
+									menuTriggerBt.setText("More");
+									menuBt.setVisibility(View.GONE);
+									bootBt.setVisibility(View.GONE);
+									menuPanel.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_out));
+								}
+							}
+							@Override
+							public void onAnimationRepeat(Animation p1)
+							{
+							}
+					});
 				}
 			});
 		menuBt.setOnClickListener(new View.OnClickListener(){
-
 				@Override
 				public void onClick(View p1)
 				{
@@ -251,46 +270,42 @@ public class MainActivity extends Activity implements View.OnClickListener
 					optionButton.setTypeface(tf);
 					helpButton.setTypeface(tf);
 					aboutButton.setOnClickListener(new View.OnClickListener(){
-
 							@Override
 							public void onClick(View p1)
 							{
-
+								SoundPoolUtils.getInstance().play("os.click", 0);
 							}
 						});
 					optionButton.setOnClickListener(new View.OnClickListener(){
-
 							@Override
 							public void onClick(View p1)
 							{
-
+								SoundPoolUtils.getInstance().play("os.click", 0);
 							}
 						});
 					helpButton.setOnClickListener(new View.OnClickListener(){
-
 							@Override
 							public void onClick(View p1)
 							{
 								Uri uri = Uri.parse("https://www.showdoc.com.cn/poloeos");
 								Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 								startActivity(intent);
-								SoundPoolUtil.getInstance().play("os.click", 0);
+								SoundPoolUtils.getInstance().play("os.click", 0);
 							}
 						});
 					AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
 						.setCancelable(true)
 						.setView(view)
 						.create();
-					final Window window = dialog.getWindow();
-					window.setBackgroundDrawable(new ColorDrawable(0));
+					dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
 					dialog.show();
-					SoundPoolUtil.getInstance().play("os.click", 0);
+					SoundPoolUtils.getInstance().play("os.click", 0);
 				}
 			});
 		unitSize = calculateProperUnitSize();
 		screenView.setUnitSize(unitSize);
 		screenView.setHandler(mHandler);
-		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)screenView.getLayoutParams();;
+		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)screenView.getLayoutParams();
 		params.width = screenView.getScreenWidth() * unitSize + 6;
 		params.height = screenView.getScreenHeight() * unitSize + 6;
 		screenView. setLayoutParams(params);
@@ -324,12 +339,12 @@ public class MainActivity extends Activity implements View.OnClickListener
 						for (int i = 0;i < noteSoundName.length;i++)
 						{
 							AssetFileDescriptor afd = getAssets().openFd("sounds/note/" + noteSoundName[i] + ".ogg");
-							SoundPoolUtil.getInstance().loadRF("note." + noteSoundName[i], afd);
+							SoundPoolUtils.getInstance().loadRF("note." + noteSoundName[i], afd);
 						}
 						for (int i = 0;i < osSoundName.length;i++)
 						{
 							AssetFileDescriptor afd = getAssets().openFd("sounds/os/" + osSoundName[i] + ".ogg");
-							SoundPoolUtil.getInstance().loadRF("os." + osSoundName[i], afd);
+							SoundPoolUtils.getInstance().loadRF("os." + osSoundName[i], afd);
 						}
 						//贴图
 						fireWorkPattern = BitmapFactory.decodeStream(getAssets().open("firework_pattern.png"));
@@ -410,26 +425,19 @@ public class MainActivity extends Activity implements View.OnClickListener
 				break;
 			case R.id.bt_boot:
 				words = "Boot";
-				SoundPoolUtil.getInstance().play("os.beep", 0);
+				SoundPoolUtils.getInstance().play("os.beep", 0);
 				break;
 			case R.id.bt_menu:
 				break;
 			default:
 		}
 		mEngine.callScriptMethod("keyEvent", new Object[]{words});
-		SoundPoolUtil.getInstance().play("os.click", 0);
+		SoundPoolUtils.getInstance().play("os.click", 0);
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (menuPanel.getVisibility() == View.VISIBLE)
-		{
-			Animation anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.menu_panel_in);
-			menuPanel.startAnimation(anim_1);
-			menuPanel.setVisibility(View.GONE);
-			menuTriggerBt.setVisibility(View.VISIBLE);
-		}
 		return super.onTouchEvent(event);
 	}
 
@@ -452,7 +460,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		{
 			//第一次使用
 
-			if (barnFile.exists()) FileIOBeta.delAllFile(dir);
+			if (barnFile.exists()) FileUtils.delAllFile(dir);
 			releaseConfFile();
 		}
 		else
@@ -466,7 +474,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 			{
 				if (version > pref.getInt("version", 0))
 				{
-					FileIOBeta.delAllFile(dir);
+					FileUtils.delAllFile(dir);
 					releaseConfFile();
 				}
 			}
@@ -478,9 +486,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 
 	public void releaseConfFile()
 	{
-		unzipFileFromAssets("core.zip", dir);
+		ZipUtils.unzipFileFromAssets(this, "core.zip", dir);
 		Message msg = new Message();
-		msg.what = MessageType.ACTION_TEXTBOX_SHOW;
+		msg.what = MessageUtils.MessageType.ACTION_TEXTBOX_SHOW;
 		Bundle data = new Bundle();
 		data.putString("text", "配置文件已释放");
 		msg.setData(data);
@@ -495,73 +503,6 @@ public class MainActivity extends Activity implements View.OnClickListener
 		isOpen3d = is;
 		renderer = new MyRenderer(this,mHandler,is);
 		animView.setRenderer(renderer);
-	}
-	/**
-	 * 从assets中解压zip文件的方法
-	 *
-	 * @param zipName    压缩文件的名称
-	 * @param targetPath 解压的路径
-	 */
-	public void unzipFileFromAssets(String zipName, String targetPath)
-	{
-		try
-		{
-			int bufferSize = 1024 * 10;
-			// 建立zip输入流
-			ZipInputStream zipInputStream = new ZipInputStream(getAssets().open(zipName));
-			// 每一个zip文件的实例对象
-			ZipEntry zipEntry;
-			// 文件路径名称
-			String fileName = "";
-			// 从输入流中得到实例
-			while ((zipEntry = zipInputStream.getNextEntry()) != null)
-			{
-				fileName = zipEntry.getName();
-				//如果为文件夹,则在目标目录创建文件夹
-				if (zipEntry.isDirectory())
-				{
-					// 截取字符串,去掉末尾的分隔符
-					fileName = fileName.substring(0, fileName.length() - 1);
-					// 创建文件夹
-					File folder = new File(targetPath + File.separator + fileName);
-					if (!folder.exists())
-					{
-						folder.mkdirs();
-						Log.i("ZipUtils", "unzip mkdirs : " + folder.getAbsolutePath());
-					}
-				}
-				else
-				{
-					File file = new File(targetPath + File.separator + fileName);
-					if (!file.exists())
-					{
-						file.createNewFile();
-						// 得到目标路径的输出流
-						FileOutputStream fos = new FileOutputStream(file);
-						// 开始读写数据
-						int length = 0;
-						byte[] buffer = new byte[bufferSize];
-						while ((length = zipInputStream.read(buffer)) != -1)
-						{
-							fos.write(buffer, 0, length);
-						}
-						fos.close();
-						Log.i("ZipUtils", "unzip createNewFile : " + file.getAbsolutePath());
-					}
-				}
-			}
-			zipInputStream.close();
-			if (new File(zipName).delete()) Log.i("ZipUtils", "zipFile has been deleted");
-
-		}
-		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -617,7 +558,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 
 	public void initializeEngine()
 	{
-		mEngine = new JsEngine(this);
+		mEngine = new JSEngine(this);
 		mEngine.setHandler(mHandler);
 		mEngine.request();
 

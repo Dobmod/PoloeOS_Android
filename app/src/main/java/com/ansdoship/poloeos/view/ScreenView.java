@@ -6,8 +6,7 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.os.Handler;
-import com.ansdoship.poloeos.util.MessageUtil;
-import com.ansdoship.poloeos.util.MessageType;
+import com.ansdoship.poloeos.util.MessageUtils;
 
 public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, Runnable
 {
@@ -18,9 +17,7 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 	private Thread mThread;
 	public static Handler mHandler;
 	
-	private int fps=  0,sharedFps = 0;
-	
-	private int width,height;
+	private int fps = 0,sharedFps = 0;
 
 	public ScreenView(Context context)
 	{
@@ -112,7 +109,7 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 					sharedFps = fps;
 					fps = 0;
 					time = System.currentTimeMillis();
-					MessageUtil.sendMessage(mHandler,MessageType.ACTION_FPS_UPDATE);
+					MessageUtils.sendMessage(mHandler,MessageUtils.MessageType.ACTION_FPS_UPDATE);
 				}
 				fps++;
 			}
