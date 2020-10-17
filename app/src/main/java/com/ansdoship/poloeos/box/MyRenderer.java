@@ -20,11 +20,13 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	private Handler activityHandler;
 	private boolean isOpen;
 	private FrameBuffer fb = null;
-	private String[] textures = {"lamp_on","lamp_off","firework_pattern"};
+	private String[] textures = {"lamp_on","lamp_off","firework_pattern","grass_top","grass_side","dirt","stone"};
 	
 	private World world;
 	private Light sun;
 	private Object3D cube = null;
+	private Sandbox sandbox;
+	private Camera cam;
 	
 	private boolean isScaled = false;
 	
@@ -68,22 +70,22 @@ public class MyRenderer implements GLSurfaceView.Renderer
 		{
 			fb.dispose();
 		}
-		fb = new FrameBuffer(p1, p2, p3);
+		fb = new FrameBuffer(p2, p3);
 		if(!isOpen) return;
 		if (activity.getMaster() == null)
 		{
 
 			world = new World();
-			world.setAmbientLight(20, 20, 20);
-
+			world.setAmbientLight(170,170,170);
+			sandbox = new Sandbox(world);
+			/*
 			sun = new Light(world);
-			sun.setIntensity(250, 250, 250);
-
-			// Create a texture out of the icon...:-)
+			sun.setDistanceOverride(200);
+			*/
 			try
 			{
 				for(String theTexture :textures){
-					Texture texture = new Texture(BitmapHelper.rescale(android.graphics.BitmapFactory.decodeStream(activity.getAssets().open(theTexture+".png")), 16, 16),true);
+					Texture texture = new Texture(BitmapHelper.rescale(android.graphics.BitmapFactory.decodeStream(activity.getAssets().open("texture/"+theTexture+".png")), 16, 16),true);
 					texture.setFiltering(false);
 					TextureManager.getInstance().addTexture(theTexture, texture);
 				}
@@ -93,21 +95,25 @@ public class MyRenderer implements GLSurfaceView.Renderer
 				e.printStackTrace();
 			}
 			
-			createBox();		
+			Block block = new Block(BlockInfo.GRASS);
+			world.addObject(block);
 
-			Camera cam = world.getCamera();
-			cam.moveCamera(Camera.CAMERA_MOVEOUT, 50);
-			cam.lookAt(cube.getTransformedCenter());
-
-			SimpleVector sv = new SimpleVector();
-			sv.set(cube.getTransformedCenter());
-			sv.z -= 100;
-			sun.setPosition(sv);
+			cam = world.getCamera();
+			//cam.moveCamera(Camera.CAMERA_MOVEOUT, 86);
+			//cam.moveCamera(Camera.CAMERA_MOVEUP,10);
+			SimpleVector sv = block.getOrigin();
+			sv.z -= 86;
+			sv.y -= 10;
+			cam.setPosition(sv);
+			cam.lookAt(block.getOrigin());
+			
+			world.removeObject(block);
+			
+			sandbox.init();
+			
 			MemoryHelper.compact();
 			
-			SimpleVector vector = cube.getOrigin();
-			vector.x -= 20;
-			cube.setOrigin(vector);
+			
 
 			if (activity.getMaster() == null)
 			{
@@ -121,91 +127,11 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	{
 		fb.clear(new RGBColor(0, 0, 0, 0));
 		if(!isOpen) return;
-		cube.rotateY(0.007f);
+		//cube.rotateY(0.007f);
 		world.renderScene(fb);
 		world.draw(fb);
 		fb.display();
-
-		/*
-		 if (System.currentTimeMillis() - time >= 1000) {
-		 Logger.log(fps + "fps");
-		 fps = 0;
-		 time = System.currentTimeMillis();
-		 }
-		 fps++;
-		 */
 	}
-
-
-	private void createBox()
-	{
-		cube = new Object3D(12);
-		// 前
-		cube.addTriangle(getPoint(-30, -30, 30), 0.0f, 0.0f,
-						 getPoint(30, -30, 30), 1.0f, 0.0f, getPoint(-30, 30, 30), 0.0f,
-						 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		cube.addTriangle(getPoint(30, -30, 30), 1.0f, 0.0f,
-						 getPoint(30, 30, 30), 1.0f, 1.0f, getPoint(-30, 30, 30), 0.0f,
-						 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		// 上
-		cube.addTriangle(getPoint(-30, 30, 30), 0.0f, 0.0f,
-						 getPoint(30, 30, 30), 1.0f, 0.0f, getPoint(-30, 30, -30), 0.0f,
-						 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		cube.addTriangle(getPoint(30, 30, 30), 1.0f, 0.0f,
-						 getPoint(30, 30, -30), 1.0f, 1.0f, getPoint(-30, 30, -30),
-						 0.0f, 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		// 后
-		cube.addTriangle(getPoint(-30, 30, -30), 0.0f, 0.0f,
-						 getPoint(30, 30, -30), 1.0f, 0.0f, getPoint(-30, -30, -30),
-						 0.0f, 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		cube.addTriangle(getPoint(30, 30, -30), 1.0f, 0.0f,
-						 getPoint(30, -30, -30), 1.0f, 1.0f, getPoint(-30, -30, -30),
-						 0.0f, 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		// 下
-		cube.addTriangle(getPoint(-30, -30, -30), 0.0f, 0.0f,
-						 getPoint(30, -30, -30), 1.0f, 0.0f, getPoint(-30, -30, 30),
-						 0.0f, 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		cube.addTriangle(getPoint(30, -30, -30), 1.0f, 0.0f,
-						 getPoint(30, -30, 30), 1.0f, 1.0f, getPoint(-30, -30, 30), 0.0f,
-						 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		// 左
-		cube.addTriangle(getPoint(-30, -30, -30), 0.0f, 0.0f,
-						 getPoint(-30, -30, 30), 1.0f, 0.0f, getPoint(-30, 30, -30),
-						 0.0f, 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		cube.addTriangle(getPoint(-30, -30, 30), 1.0f, 0.0f,
-						 getPoint(-30, 30, 30), 1.0f, 1.0f, getPoint(-30, 30, -30),
-						 0.0f, 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		// 右
-		cube.addTriangle(getPoint(30, -30, 30), 0.0f, 0.0f,
-						 getPoint(30, -30, -30), 1.0f, 0.0f, getPoint(30, 30, 30), 0.0f,
-						 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-		cube.addTriangle(getPoint(30, -30, -30), 1.0f, 0.0f,
-						 getPoint(30, 30, -30), 1.0f, 1.0f, getPoint(30, 30, 30), 0.0f,
-						 1.0f, TextureManager.getInstance().getTextureID("lamp_off"));
-						 
-		cube.strip();
-		cube.build();
-		world.addObject(cube);
-		cube.setCulling(false);
-		cube.scale(0.1f);
-	}
-	
-	public Object3D createFirework(){
-		Object3D obj = new Object3D(2);
-		float index = Math.round(Math.random()*6);
-		obj.addTriangle(getPoint(-30, -30, 30), 0.125f*(index-1), 1.0f,
-						 getPoint(30, -30, 30), 0.125f*index, 1.0f, getPoint(-30, 30, 30), 0.125f*(index-1),
-						 0.0f, TextureManager.getInstance().getTextureID("firework_pattern"));
-		obj.addTriangle(getPoint(30, -30, 30), 0.125f*index, 1.0f,
-						 getPoint(30, 30, 30), 0.125f*index, 0.0f, getPoint(-30, 30, 30), 0.125f*(index-1),
-						 0.0f, TextureManager.getInstance().getTextureID("firework_pattern"));
-		obj.strip();
-		obj.build();
-		obj.setCulling(false);
-		obj.scale(0.05f);
-		return obj;
-	}
-
 
 	public SimpleVector getPoint(int x, int y, int z)
 	{

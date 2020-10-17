@@ -54,8 +54,8 @@ public class ScreenEntity extends ScriptableObject
 
 	public void loadResource(Context ctx){
 		try{
-			lampOnTexture = BitmapFactory.decodeStream(ctx.getAssets().open("lamp_on.png"));
-			lampOffTexture = BitmapFactory.decodeStream(ctx.getAssets().open("lamp_off.png"));
+			lampOnTexture = BitmapFactory.decodeStream(ctx.getAssets().open("texture/lamp_on.png"));
+			lampOffTexture = BitmapFactory.decodeStream(ctx.getAssets().open("texture/lamp_off.png"));
 		}catch(IOException e){
 			e.printStackTrace();
 		}

@@ -316,6 +316,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 		screenView.startAnimation(anim_1);
 		
 		//Anim View
+		animView.setEGLContextClientVersion(2);
 		animView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 		animView.setZOrderOnTop(true);  
 		animView.getHolder().setFormat(android.graphics.PixelFormat.TRANSLUCENT); 
@@ -347,7 +348,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 							SoundPoolUtils.getInstance().loadRF("os." + osSoundName[i], afd);
 						}
 						//贴图
-						fireWorkPattern = BitmapFactory.decodeStream(getAssets().open("firework_pattern.png"));
+						//fireWorkPattern = BitmapFactory.decodeStream(getAssets().open("firework_pattern.png"));
 					}
 					catch (IOException e)
 					{
