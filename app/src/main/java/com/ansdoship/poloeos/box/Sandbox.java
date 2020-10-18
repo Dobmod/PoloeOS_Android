@@ -12,18 +12,18 @@ public class Sandbox
 	}
 	
 	public void init(){
-		for(int i = 18;i<26;i++){
-			for(int j= 0;j<12;j++){
+		for(int i = 0;i<8;i++){
+			for(int j= 0;j<8;j++){
 				world.setTile(BlockInfo.STONE,i,0,j);
 				world.setTile(BlockInfo.GRASS,i,1,j);
 			}
 		}
-		world.setTile(BlockInfo.STONE,20,2,4);
-		world.setTile(BlockInfo.STONE,20,3,4);
-		world.setTile(BlockInfo.DIRT,20,4,4);
+		world.setTile(BlockInfo.STONE,2,2,4);
+		world.setTile(BlockInfo.STONE,2,3,4);
+		world.setTile(BlockInfo.DIRT,2,4,4);
 	}
 	
-	public SimpleVector getCenter(){
-		return new SimpleVector(20*2,0,6*2);
+	public BlockWorld getBlockWorld(){
+		return this.world;
 	}
 }

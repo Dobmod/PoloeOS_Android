@@ -20,12 +20,12 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	private Handler activityHandler;
 	private boolean isOpen;
 	private FrameBuffer fb = null;
-	private String[] textures = {"lamp_on","lamp_off","firework_pattern","grass_top","grass_side","dirt","stone"};
+	private String[] textures = {"lamp_on","lamp_off","firework_pattern","grass_top","grass_side","dirt","stone","steve"};
 	
 	private World world;
 	private Light sun;
 	private Object3D cube = null;
-	private Sandbox sandbox;
+	public static Sandbox sandbox;
 	private Camera cam;
 	
 	private boolean isScaled = false;

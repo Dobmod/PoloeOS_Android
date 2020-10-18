@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.os.Message;
 import com.ansdoship.poloeos.util.MessageUtils;
 import android.os.Bundle;
+import android.graphics.Matrix;
 
 public class ScreenEntity extends ScriptableObject
 {
@@ -54,8 +55,12 @@ public class ScreenEntity extends ScriptableObject
 
 	public void loadResource(Context ctx){
 		try{
-			lampOnTexture = BitmapFactory.decodeStream(ctx.getAssets().open("texture/lamp_on.png"));
-			lampOffTexture = BitmapFactory.decodeStream(ctx.getAssets().open("texture/lamp_off.png"));
+			Matrix matrix = new Matrix();
+			float sX = mSize/16.0f;
+			System.out.println(sX);
+			matrix.postScale(sX,sX);
+			lampOnTexture = Bitmap.createBitmap( BitmapFactory.decodeStream(ctx.getAssets().open("texture/lamp_on.png")),0,0,16,16,matrix,true);
+			lampOffTexture = Bitmap.createBitmap( BitmapFactory.decodeStream(ctx.getAssets().open("texture/lamp_off.png")),0,0,16,16,matrix,true);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -73,16 +78,19 @@ public class ScreenEntity extends ScriptableObject
 		canvas.drawRect(0,0,width+5,height+5,mPaint);
 		
 		
-		for(int i = 0;i<this.height;i++){
-			for(int j = 0;j<this.width;j++){
+		for(int i = 0,heightSize = this.height;i<heightSize;i++){
+			for(int j = 0,widthSize = this.width;j<widthSize;j++){
 				int left = j*mSize+3;
 				int top = (this.height-1-i)*mSize+3;
-				Rect unitRect = new Rect(0,0,16,16);
-				Rect dstRect = new Rect(left,top,left+mSize,top+mSize);
+				
+				//Rect unitRect = new Rect(0,0,16,16);
+				//Rect dstRect = new Rect(left,top,left+mSize,top+mSize);
 				if(bufferArray[i][j]==241)
-					canvas.drawBitmap(lampOnTexture,unitRect,dstRect,mPaint);
+					canvas.drawBitmap(lampOnTexture,left,top,mPaint);
+					//canvas.drawBitmap(lampOnTexture,unitRect,dstRect,mPaint);
 				else{
-					canvas.drawBitmap(lampOffTexture,unitRect,dstRect,mPaint);
+					canvas.drawBitmap(lampOffTexture,left,top,mPaint);
+					//canvas.drawBitmap(lampOffTexture,unitRect,dstRect,mPaint);
 				}
 			}
 		}

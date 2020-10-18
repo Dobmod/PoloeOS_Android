@@ -303,7 +303,6 @@ public class MainActivity extends Activity implements View.OnClickListener
 				}
 			});
 		unitSize = calculateProperUnitSize();
-		screenView.setUnitSize(unitSize);
 		screenView.setHandler(mHandler);
 		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)screenView.getLayoutParams();
 		params.width = screenView.getScreenWidth() * unitSize + 6;

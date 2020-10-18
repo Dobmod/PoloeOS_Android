@@ -7,6 +7,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.os.Handler;
 import com.ansdoship.poloeos.util.MessageUtils;
+import android.view.WindowManager;
 
 public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, Runnable
 {
@@ -42,6 +43,7 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 		mHolder = getHolder();
 		mHolder.addCallback(this);
 		mScreen = new ScreenEntity();
+		mScreen.setUnitSize(calculateProperUnitSize());
 		mScreen.loadResource(getContext());
 	}
 
@@ -67,10 +69,6 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 		//mScreen.destroyed();
 	}
 	
-	public void setUnitSize(int size){
-		mScreen.setUnitSize(size);
-	}
-	
 	public void setHandler(Handler h){
 		this.mHandler = h;
 	}
@@ -85,6 +83,14 @@ public class ScreenView extends SurfaceView implements SurfaceHolder.Callback, R
 	
 	public int getCurrentFps(){
 		return this.sharedFps;
+	}
+	
+	private int calculateProperUnitSize()
+	{
+		WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
+		int width = wm.getDefaultDisplay().getWidth();
+		int height = wm.getDefaultDisplay().getHeight();
+		return width / 2 / getScreenWidth();
 	}
 
 	@Override

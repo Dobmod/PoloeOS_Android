@@ -83,6 +83,7 @@ public class JSEngine
 			ScriptableObject.defineClass(scope, Level.class);
 			ScriptableObject.defineClass(scope, Player.class);
 			ScriptableObject.defineClass(scope, Block.class);
+			ScriptableObject.defineClass(scope,Sandbox.class);
             //执行 js 代码
 			//Object x = rhino.evaluateString(scope, jsCode, clazz.getSimpleName(), 1, null);
 			script.exec(rhino, scope);
