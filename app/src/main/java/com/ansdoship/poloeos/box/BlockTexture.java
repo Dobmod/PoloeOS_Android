@@ -30,6 +30,48 @@ public class BlockTexture
 		return TextureManager.getInstance().getTextureID(name);
 	}
 	
+	public static float[] getTextcoorsById(int id){
+		float[] coors = {
+			0,0,1.0f,0,0,1.0f,1.0f,0,1.0f,1.0f,0,1.0f,
+			0,0,1.0f,0,0,1.0f,1.0f,0,1.0f,1.0f,0,1.0f,
+			0,0,1.0f,0,0,1.0f,1.0f,0,1.0f,1.0f,0,1.0f,
+			0,0,1.0f,0,0,1.0f,1.0f,0,1.0f,1.0f,0,1.0f,
+			0,0,1.0f,0,0,1.0f,1.0f,0,1.0f,1.0f,0,1.0f,
+			0,0,1.0f,0,0,1.0f,1.0f,0,1.0f,1.0f,0,1.0f
+		};
+		switch(id){
+			case BlockInfo.STONE:
+				
+				break;
+		}
+		return coors;
+	}
+	
+	private static float[] getTexcoors(int x,int y){
+		float posX = x*0.125f,posY = y*0.125f,offsetX = posX+0.125f,offsetY = posY+0.125f;
+		float[] coors = new float[72];
+		for(int i = 0;i<72;i+=12){
+			coors[i] = posX;
+			coors[i+1] = posY;
+			
+			coors[i+2] = offsetX;
+			coors[i+3] = posY;
+			
+			coors[i+4] = posX;
+			coors[i+5] = offsetY;
+			
+			coors[i+6] = offsetX;
+			coors[i+7] = posY;
+			
+			coors[i+8] = offsetX;
+			coors[i+9] = offsetY;
+			
+			coors[i+10] = posX;
+			coors[i+11] = offsetY;
+		}
+		return coors;
+	}
+	
 	private static String getDirection(int direct){
 		String result = "";
 		switch(direct){

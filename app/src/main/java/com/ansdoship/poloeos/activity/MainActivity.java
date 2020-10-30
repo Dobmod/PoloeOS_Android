@@ -50,6 +50,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 {
 	
 	private static MainActivity master = null;
+	private int realScreenWidth = 0,realScreenHeight = 0;
 	
 	public static String dir = "";
 	private boolean isOpen3d = false;
@@ -66,7 +67,6 @@ public class MainActivity extends Activity implements View.OnClickListener
 	private int unitSize;
 	private String[] noteSoundName = {"bdrum","bell","bass","flute","guitar","harp","icechime","pling","snare","xylobone"};
 	private String[] osSoundName = {"click","start","error","noise","beep"};
-	private Bitmap fireWorkPattern;
 
 	private Handler mHandler = new Handler(){
 
@@ -121,7 +121,12 @@ public class MainActivity extends Activity implements View.OnClickListener
 					SoundPoolUtils.getInstance(). play("os.error", 1);
 					break;
 				case MessageUtils.MessageType.ACTION_FPS_UPDATE:
-					textFps.setText(String.valueOf(screenView.getCurrentFps()));
+					StringBuilder debugInformText = new StringBuilder();
+					debugInformText.append("3d:");
+					debugInformText.append(renderer.getCurrentFps());
+					debugInformText.append("\n2d:");
+					debugInformText.append(screenView.getCurrentFps());
+					textFps.setText(debugInformText.toString());
 					break;
 			}
 		}
@@ -308,6 +313,12 @@ public class MainActivity extends Activity implements View.OnClickListener
 		params.width = screenView.getScreenWidth() * unitSize + 6;
 		params.height = screenView.getScreenHeight() * unitSize + 6;
 		screenView. setLayoutParams(params);
+		FrameLayout.LayoutParams params1 = (FrameLayout.LayoutParams)animView.getLayoutParams();
+		params1.width = params.width/3;
+		params1.height = params.height/2;
+		params1.leftMargin = realScreenWidth/2+params.width/2+8;
+		params1.topMargin = params.height/2+6;
+		animView.setLayoutParams(params1);
 		panel.setVisibility(View.VISIBLE);
 		Animation anim = AnimationUtils.loadAnimation(this, R.anim.button_panel_out);
 		panel.startAnimation(anim);
@@ -553,6 +564,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 		WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
 		int width = wm.getDefaultDisplay().getWidth();
 		int height = wm.getDefaultDisplay().getHeight();
+		realScreenWidth = width;
+		realScreenHeight = height;
 		return width / 2 / screenView.getScreenWidth();
 	}
 

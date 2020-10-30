@@ -12,7 +12,6 @@ public class Block extends Object3D
 	public static final int DIRECTION_RIGHT = 4;
 	public static final int DIRECTION_UP = 5;
 	public static final int DIRECTION_DOWN = 6;
-	public static final int DIRECTION_SURROUND = 7;
 	
 	
 	public Block(int id)

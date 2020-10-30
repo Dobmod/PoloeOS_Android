@@ -1,9 +1,7 @@
 package com.ansdoship.poloeos.util;
 
 import android.content.res.Resources;
-
 import com.ansdoship.poloeos.activity.MainActivity;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +28,8 @@ public class FileUtils
 			BufferedReader br = new BufferedReader(new FileReader(new File(path)));//构造一个BufferedReader类来读取文件
 			String s = null;
 			while ((s = br.readLine()) != null)
-			{//使用readLine方法，一次读一行
+			{
+				//使用readLine方法，一次读一行
 				result += s+"\n";
 			}
 			br.close();    

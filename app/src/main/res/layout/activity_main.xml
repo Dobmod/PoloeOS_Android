@@ -276,7 +276,7 @@
 		android:textColor="#FFFFFFFF"
 		android:textSize="10sp"
 		android:layout_gravity="bottom|left"
-		android:gravity="center"
+		android:gravity="left|center_vertical"
 		android:layout_margin="2dp"/>
 
 </FrameLayout>

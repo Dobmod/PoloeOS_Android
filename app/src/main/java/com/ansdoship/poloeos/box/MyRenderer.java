@@ -20,13 +20,14 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	private Handler activityHandler;
 	private boolean isOpen;
 	private FrameBuffer fb = null;
-	private String[] textures = {"lamp_on","lamp_off","firework_pattern","grass_top","grass_side","dirt","stone","steve"};
+	private String[] textures = {"lamp_on","lamp_off","firework_pattern","grass_top","grass_side","dirt","stone","blocks"};
 	
 	private World world;
-	private Light sun;
 	private Object3D cube = null;
 	public static Sandbox sandbox;
 	private Camera cam;
+	private Ticker fpsTicker = new Ticker(1000);//1秒一tick
+	private short fpsCounter = 0,shareFps = 0;
 	
 	private boolean isScaled = false;
 	
@@ -60,7 +61,6 @@ public class MyRenderer implements GLSurfaceView.Renderer
 	@Override
 	public void onSurfaceCreated(GL10 p1, EGLConfig p2)
 	{
-		p1.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
 	}
 
 	@Override
@@ -78,10 +78,7 @@ public class MyRenderer implements GLSurfaceView.Renderer
 			world = new World();
 			world.setAmbientLight(170,170,170);
 			sandbox = new Sandbox(world);
-			/*
-			sun = new Light(world);
-			sun.setDistanceOverride(200);
-			*/
+			
 			try
 			{
 				for(String theTexture :textures){
@@ -94,26 +91,19 @@ public class MyRenderer implements GLSurfaceView.Renderer
 			{
 				e.printStackTrace();
 			}
-			
-			Block block = new Block(BlockInfo.GRASS);
-			world.addObject(block);
+			sandbox.init();
+			Object3D chunk = sandbox.getChunk();
 
 			cam = world.getCamera();
 			//cam.moveCamera(Camera.CAMERA_MOVEOUT, 86);
 			//cam.moveCamera(Camera.CAMERA_MOVEUP,10);
-			SimpleVector sv = block.getOrigin();
-			sv.z -= 86;
-			sv.y -= 10;
+			SimpleVector sv = chunk.getTransformedCenter();
+			sv.z -= 20;
+			sv.y -= 3;
 			cam.setPosition(sv);
-			cam.lookAt(block.getOrigin());
-			
-			world.removeObject(block);
-			
-			sandbox.init();
+			cam.lookAt(chunk.getTransformedCenter());
 			
 			MemoryHelper.compact();
-			
-			
 
 			if (activity.getMaster() == null)
 			{
@@ -121,18 +111,29 @@ public class MyRenderer implements GLSurfaceView.Renderer
 			}
 		}
 	}
-
+	
 	@Override
 	public void onDrawFrame(GL10 p1)
 	{
 		fb.clear(new RGBColor(0, 0, 0, 0));
 		if(!isOpen) return;
-		//cube.rotateY(0.007f);
+		
 		world.renderScene(fb);
 		world.draw(fb);
+		
 		fb.display();
+		
+		fpsCounter++;
+		if(fpsTicker.getTicks()==1){
+			shareFps = new Short(fpsCounter);
+			fpsCounter = 0;
+		}
 	}
 
+	public short getCurrentFps(){
+		return this.shareFps;
+	}
+	
 	public SimpleVector getPoint(int x, int y, int z)
 	{
 		return new SimpleVector(x, y, z);
